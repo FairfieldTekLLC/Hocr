@@ -28,7 +28,13 @@ namespace Hocr.Cmd
 
         static void Main(string[] args)
         {
-            comp = new PdfCompressor(@"C:\gs\gs9.24\bin\gswin64c.exe", @"C:\Tesseract-OCR\");
+            //The folder and path for ghostscript
+            const string ghostScriptPathToExecutable = @"C:\gs\gs9.24\bin\gswin64c.exe";
+            //The folder where Tesseract is installed
+            const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
+
+
+            comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder);
             comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
             
 
