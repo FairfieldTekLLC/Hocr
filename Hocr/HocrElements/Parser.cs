@@ -71,7 +71,7 @@ namespace Hocr.HocrElements
                     }
 
                     bbox = string.Empty;
-                    if (c.BBox.Left != -1)
+                    if ((int)c.BBox.Left != -1)
                     {
                         c.ListOrder = charPos;
                         w.Characters.Add(c);
@@ -81,15 +81,14 @@ namespace Hocr.HocrElements
 
                 bbox += coords[i] + " ";
             }
-            if (w.Characters.Count > 0 && word != null && word.Trim() != string.Empty)
-            {
-                w.Text = word;
-                w.CleanText();
-                _currentLine.Words.Add(w);
-            }
+            if (w.Characters.Count <= 0 || word.Trim() == string.Empty)
+                return;
+            w.Text = word;
+            w.CleanText();
+            _currentLine.Words.Add(w);
         }
 
-        public static HDocument ParseHocr(HDocument hOrcDoc, string hOcrFile, bool Append)
+        public static HDocument ParseHocr(HDocument hOrcDoc, string hOcrFile, bool append)
         {
             _hDoc = hOrcDoc;
 
@@ -190,12 +189,12 @@ namespace Hocr.HocrElements
             }
         }
 
-        private static void ParseTitle(string Title, HOcrClass ocrclass)
+        private static void ParseTitle(string title, HOcrClass ocrclass)
         {
-            if (Title == null)
+            if (title == null)
                 return;
 
-            string[] values = Title.Split(';');
+            string[] values = title.Split(';');
             foreach (string s in values)
             {
                 if (s.Contains("image ") || s.Contains("file "))
@@ -218,16 +217,14 @@ namespace Hocr.HocrElements
                 }
                 if (s.Contains("ppageno"))
                 {
-                    int frame;
-                    if (int.TryParse(s.Replace("ppageno", ""), out frame))
+                    if (int.TryParse(s.Replace("ppageno", ""), out int frame))
                         _currentPage.ImageFrameNumber = frame;
                 }
-                if (s.Contains("bbox"))
-                {
-                    string coords = s.Replace("bbox", "");
-                    BBox box = new BBox(coords);
-                    ocrclass.BBox = box;
-                }
+                if (!s.Contains("bbox"))
+                    continue;
+                string coords = s.Replace("bbox", "");
+                BBox box = new BBox(coords);
+                ocrclass.BBox = box;
             }
         }
     }

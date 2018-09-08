@@ -11,11 +11,11 @@ namespace Hocr.Cmd
     {
         private static bool _running = true;
 
-        private static int FileCounter = 2;
+        private static int FileCounter = 3;
 
         static async void Example(byte[] data,string outfile)
         {
-            var odata = await Task.Run(() => comp.CreateSearchablePdf(data));
+            byte[] odata = await Task.Run(() => comp.CreateSearchablePdf(data));
             File.WriteAllBytes(outfile,odata);
             Console.WriteLine("Finished " + outfile);
             FileCounter = FileCounter - 1;
@@ -38,14 +38,18 @@ namespace Hocr.Cmd
             comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
             
 
-            var data = File.ReadAllBytes(@"Test1.pdf");
-            var data1 = File.ReadAllBytes(@"Test2.pdf");
+            byte[] data = File.ReadAllBytes(@"Test1.pdf");
+            byte[] data1 = File.ReadAllBytes(@"Test2.pdf");
+            byte[] data2 = File.ReadAllBytes(@"Test3.pdf");
 
             Example(data, @"Test1_ocr.pdf");
             Console.WriteLine("Started Test 1");
 
             Example(data1, @"Test2_ocr.pdf");
             Console.WriteLine("Starting Test 2");
+
+            Example(data2, @"Test3_ocr.pdf");
+            Console.WriteLine("Starting Test 3");
 
             int counter = 0;
             while (_running)

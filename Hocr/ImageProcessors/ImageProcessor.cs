@@ -106,7 +106,7 @@ namespace Hocr.ImageProcessors
 
         public static Bitmap ConvertToBitonal(Bitmap original)
         {
-            Bitmap source = null;
+            Bitmap source;
 
             // If original bitmap is not already in 32 BPP, ARGB format, then convert
             if (original.PixelFormat != PixelFormat.Format32bppArgb)
@@ -233,7 +233,7 @@ namespace Hocr.ImageProcessors
 
         public static Image ConvertToImage(Image imageToConvert, string codecName, long quality, int dpi)
         {
-            Bitmap Bmp = GetAsBitmap(imageToConvert, dpi); // AForge.Imaging.Image.Clone((Bitmap)ResizeImage(imageToConvert, Dpi, 60));
+            Bitmap bmp = GetAsBitmap(imageToConvert, dpi); 
 
             ImageCodecInfo codecInfo = GetCodecInfoForName(codecName);
 
@@ -243,21 +243,21 @@ namespace Hocr.ImageProcessors
             };
 
 
-            Bitmap newBitmap = new Bitmap(Bmp);
+            Bitmap newBitmap = new Bitmap(bmp);
 
             newBitmap.SetResolution(dpi, dpi);
 
             MemoryStream ms = new MemoryStream();
             newBitmap.Save(ms, codecInfo, encoderParams);
-            Bmp.Dispose();
+            bmp.Dispose();
             newBitmap.Dispose();
             return Image.FromStream(ms);
         }
 
         public static Image ConvertToJpeg(Image imageToConvert, long quality, int dpi)
         {
-            Bitmap Bmp = GetAsBitmap(imageToConvert, dpi); // AForge.Imaging.Image.Clone((Bitmap)ResizeImage(imageToConvert, Dpi, 60));
-            Bmp.SetResolution(dpi, dpi);
+            Bitmap bmp = GetAsBitmap(imageToConvert, dpi);
+            bmp.SetResolution(dpi, dpi);
             ImageCodecInfo codecInfo = GetCodecInfoForName("JPEG");
 
             EncoderParameters encoderParams = new EncoderParameters(1)
@@ -268,32 +268,28 @@ namespace Hocr.ImageProcessors
 
             MemoryStream ms = new MemoryStream();
 
-            Bmp.Save(ms, codecInfo, encoderParams);
-            Bmp.Dispose();
+            bmp.Save(ms, codecInfo, encoderParams);
+            bmp.Dispose();
             return Image.FromStream(ms);
         }
 
         public static Image ConvertToPng(Image imageToConvert, long quality, int dpi)
         {
-            Bitmap Bmp = GetAsBitmap(imageToConvert, dpi); // AForge.Imaging.Image.Clone((Bitmap)ResizeImage(imageToConvert, Dpi, 60));
-            Bmp.SetResolution(dpi, dpi);
+            Bitmap bmp = GetAsBitmap(imageToConvert, dpi); 
+            bmp.SetResolution(dpi, dpi);
             ImageCodecInfo codecInfo = GetCodecInfoForName("PNG");
 
             EncoderParameters encoderParams = new EncoderParameters(1)
             {
                 Param = {[0] = new EncoderParameter(Encoder.Quality, quality)}
             };
-
-
             MemoryStream ms = new MemoryStream();
-
-            //Bmp = ResizeImage (Bmp, Dpi, 80);
-            Bmp.Save(ms, codecInfo, encoderParams);
-            Bmp.Dispose();
+            bmp.Save(ms, codecInfo, encoderParams);
+            bmp.Dispose();
             return Image.FromStream(ms);
         }
 
-        public static Bitmap ConvertToRGB(Bitmap original)
+        public static Bitmap ConvertToRgb(Bitmap original)
         {
             Bitmap newImage = new Bitmap(original.Width, original.Height, PixelFormat.Format32bppArgb);
             newImage.SetResolution(original.HorizontalResolution, original.VerticalResolution);
@@ -306,12 +302,7 @@ namespace Hocr.ImageProcessors
 
         public static Bitmap CropBorders(int top, int bottom, int left, int right, Bitmap bmp)
         {
-            BBox b = new BBox();
-            b.Height = bmp.Height - (top + bottom);
-            b.Width = bmp.Width - (left + right);
-            b.Left = left;
-            b.Top = top;
-
+            BBox b = new BBox {Height = bmp.Height - (top + bottom), Width = bmp.Width - (left + right), Left = left, Top = top};
             return CropToRectangle(b, bmp);
         }
 
@@ -329,12 +320,12 @@ namespace Hocr.ImageProcessors
             return Deskew.RotateImage(bmp, a);
         }
 
-        public static Bitmap GetAsBitmap(Image image, int Dpi)
+        public static Bitmap GetAsBitmap(Image image, int dpi)
         {
             try
             {
                 Bitmap bmp = new Bitmap(image.Width, image.Height, PixelFormat.Format24bppRgb);
-                bmp.SetResolution(Dpi, Dpi);
+                bmp.SetResolution(dpi, dpi);
                 Graphics g = Graphics.FromImage(bmp);
                 g.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height));
 
@@ -408,6 +399,7 @@ namespace Hocr.ImageProcessors
 
                 for (int i = 0; i < data.Height * data.Width; i++)
                 {
+                    // ReSharper disable once PossibleNullReferenceException
                     Color color = Color.FromArgb(pt[i]);
 
                     if (color.A == 0 || (color.R == color.G && color.G == color.B))
@@ -424,19 +416,19 @@ namespace Hocr.ImageProcessors
 
       
 
-        public static Bitmap ResizeImage(Image imgToResize, int resolution, int Percent)
+        public static Bitmap ResizeImage(Image imgToResize, int resolution, int percent)
         {
             int sourceWidth = imgToResize.Width;
             int sourceHeight = imgToResize.Height;
 
-            decimal percent = Percent / 100.00M;
+            decimal per = percent / 100.00M;
             int destWidth = sourceWidth;
             int destHeight = sourceHeight;
             if (sourceWidth > 5)
-                destWidth = (int) (sourceWidth * percent);
+                destWidth = (int) (sourceWidth * per);
 
             if (sourceHeight > 5)
-                destHeight = (int) (sourceHeight * percent);
+                destHeight = (int) (sourceHeight * per);
 
             Bitmap b = new Bitmap(destWidth, destHeight);
 
@@ -458,14 +450,14 @@ namespace Hocr.ImageProcessors
         {
             //--------------------------------------------------------------------
             // Finding the Bounds of Crop Area bu using Unsafe Code and Image Proccesing
-            Color c;
             int width = bmp.Width, height = bmp.Height;
             bool upperLeftPointFounded = false;
             Point[] bounds = new Point[2];
             for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
             {
-                c = bmp.GetPixel(x, y);
+                Color c = bmp.GetPixel(x, y);
+                // ReSharper disable once PossibleInvalidOperationException
                 bool sameAsBackColor = c.R <= backColor.Value.R * 1.1 && c.R >= backColor.Value.R * 0.9 && c.G <= backColor.Value.G * 1.1 &&
                                        c.G >= backColor.Value.G * 0.9 && c.B <= backColor.Value.B * 1.1 && c.B >= backColor.Value.B * 0.9;
                 if (!sameAsBackColor)

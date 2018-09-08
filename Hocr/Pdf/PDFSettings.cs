@@ -1,37 +1,12 @@
-﻿using iTextSharp.text;
+﻿using Hocr.Enums;
+using iTextSharp.text;
 
 namespace Hocr.Pdf
 {
-    public  enum PdfMode
+   
+    public  class PdfSettings
     {
-        Ocr,
-        DrawBlocks,
-        TextOnly,
-        ImageOnly,
-        Debug
-    }
-
-    public enum WriteTextMode
-    {
-        Line,
-        Word,
-        Character
-    }
-
-    public enum PdfImageType
-    {
-        Bmp,
-        Jpg,
-        Tif,
-        Png,
-        JBig2,
-        Gif
-    }
-
-    
-    public  class PDFSettings
-    {
-        public PDFSettings()
+        public PdfSettings()
         {
             Dpi = 600;
     

@@ -30,6 +30,44 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -47,6 +85,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\CompressorState.cs" />
+    <Compile Include="Enums\PdfImageType.cs" />
+    <Compile Include="Enums\PdfMode.cs" />
+    <Compile Include="Enums\WriteTextMode.cs" />
     <Compile Include="HocrElements\BBox.cs" />
     <Compile Include="HocrElements\hChar.cs" />
     <Compile Include="HocrElements\hDocument.cs" />
@@ -56,17 +97,21 @@
     <Compile Include="HocrElements\hParagraph.cs" />
     <Compile Include="HocrElements\hWord.cs" />
     <Compile Include="HocrElements\Parser.cs" />
+    <Compile Include="HocrElements\UnitFormat.cs" />
     <Compile Include="ImageProcessors\Deskew.cs" />
     <Compile Include="ImageProcessors\GhostScript.cs" />
     <Compile Include="ImageProcessors\ImageMagick.cs" />
     <Compile Include="ImageProcessors\ImageProcessor.cs" />
     <Compile Include="ImageProcessors\JBig2.cs" />
     <Compile Include="OcrController.cs" />
+    <Compile Include="Pdf\MyImageRenderListener.cs" />
     <Compile Include="Pdf\PageSizes.cs" />
+    <Compile Include="Pdf\ParsedPageImage.cs" />
     <Compile Include="Pdf\PdfCompressor.cs" />
     <Compile Include="Pdf\PdfCreator.cs" />
     <Compile Include="Pdf\PdfReader.cs" />
     <Compile Include="Pdf\PDFSettings.cs" />
+    <Compile Include="Pdf\PdfTextExtractionStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TempData.cs" />
   </ItemGroup>

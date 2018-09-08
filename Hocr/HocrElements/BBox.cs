@@ -3,11 +3,7 @@ using System.Text;
 
 namespace Hocr.HocrElements
 {
-    internal enum UnitFormat
-    {
-        Pixel,
-        Point
-    }
+ 
 
     internal class BBox
     {

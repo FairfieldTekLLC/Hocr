@@ -8,17 +8,17 @@ namespace Hocr.ImageProcessors
     {
         public GhostScript(string path)
         {
-            Path = path;
+            _path = path;
         }
 
-        private string Path = string.Empty;
+        private readonly string _path;
 
         public const string Tiff12Nc = "tiff12nc";
         public const string Tiffg4 = "tiffg4";
 
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum,string sessionName)
         {
-            string outPut = getOutPutFileName(sessionName, ".bmp");
+            string outPut = GetOutPutFileName(sessionName, ".bmp");
             pdf = "\"" + pdf + "\"";
             string command = string.Concat("-dNOPAUSE -q -r300 -sDEVICE=bmp16m -dBATCH -dFirstPage=", startPageNum.ToString(), " -dLastPage=",
                 endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " -c quit");
@@ -29,7 +29,7 @@ namespace Hocr.ImageProcessors
 
         public string ConvertPdftoJpeg(string pdf, int startPageNum, int endPageNum,string sessionName)
         {
-            string outPut = getOutPutFileName(sessionName, ".jpeg");
+            string outPut = GetOutPutFileName(sessionName, ".jpeg");
             pdf = "\"" + pdf + "\"";
             string command = string.Concat("-dNOPAUSE -q -r300 -sDEVICE=jpeg -dNumRenderingThreads=8 -dBATCH -dFirstPage=", startPageNum.ToString(),
                 " -dLastPage=", endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " -c quit");
@@ -57,7 +57,7 @@ namespace Hocr.ImageProcessors
 
         public string ConvertPdftoPng(string pdf, int startPageNum, int endPageNum,string sessionName)
         {
-            string outPut = getOutPutFileName(sessionName, ".png");
+            string outPut = GetOutPutFileName(sessionName, ".png");
             pdf = "\"" + pdf + "\"";
             string command = string.Concat("-dNOPAUSE -r300 -q -dSAFER -sDEVICE=png16m -dINTERPOLATE -dNumRenderingThreads=8  -dBATCH -dFirstPage=",
                 startPageNum.ToString(), " -dLastPage=", endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " 30000000 setvmthreshold -c quit");
@@ -66,10 +66,8 @@ namespace Hocr.ImageProcessors
             return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
         }
 
-        private string getOutPutFileName(string sessionName, string extWithDot)
+        private static string GetOutPutFileName(string sessionName, string extWithDot)
         {
-            
-
             return "\"" + TempData.Instance.CreateTempFile(sessionName, extWithDot) + "\"";
         }
 
@@ -77,7 +75,7 @@ namespace Hocr.ImageProcessors
         {
             Process p = new Process();
 
-            ProcessStartInfo s = new ProcessStartInfo(Path, command)
+            ProcessStartInfo s = new ProcessStartInfo(_path, command)
             {
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,

@@ -1,14 +1,8 @@
 ﻿
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Dynamic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Hocr.Enums;
-using Hocr.HocrElements;
 
 namespace Hocr.Pdf
 {
@@ -19,43 +13,34 @@ namespace Hocr.Pdf
     public class PdfCompressor
     {
         private string GhostScriptPath {
-            get; set;
+            get;
         }
         private string TesseractPath {
-            get; set;
+            get;
         }
 
-        private string progress = string.Empty;
-
-        public PdfCompressor(string ghostScriptPath, string tesseractPath, PDFSettings settings = null)
+        public PdfCompressor(string ghostScriptPath, string tesseractPath, PdfSettings settings = null)
         {
             TesseractPath = tesseractPath;
             GhostScriptPath = ghostScriptPath;
-            //InputFileName = InputPDF;
-            //OutputFileName = OutputPDF;
-            PdfSettings = settings ?? new PDFSettings();
-            //state = CompressorState.Pending;
+            PdfSettings = settings ?? new PdfSettings();
         }
-
-
-
+        
         public PdfMode Mode {
             get; set;
         }
-
-
-        public PDFSettings PdfSettings {
+        
+        public PdfSettings PdfSettings {
             get; set;
         }
-
-
+        
         private bool CompressAndOcr(string sessionName, string inputFileName, string outputFileName)
         {
 
             PdfReader reader = new PdfReader(inputFileName, GhostScriptPath);
             PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath)
             {
-                PDFSettings =
+                PdfSettings =
                 {
                     WriteTextMode = WriteTextMode.Word
                 }
@@ -65,10 +50,8 @@ namespace Hocr.Pdf
                 for (int i = 1; i <= reader.PageCount; i++)
                 {
                     string img = reader.GetPageImage(i, true, sessionName);
-
                     if (OnPreProcessImage != null)
                         img = OnPreProcessImage(img);
-
                     writer.AddPage(img, PdfMode.Ocr, sessionName);
                 }
                 writer.SaveAndClose();
@@ -99,14 +82,14 @@ namespace Hocr.Pdf
 
         public async Task<byte[]> CreateSearchablePdf(byte[] fileData)
         {
-            string sessionName = System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetRandomFileName());
+            string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
             TempData.Instance.CreateNewSession(sessionName);
 
             string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
             string outputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
 
-            using (var writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
+            using (FileStream writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
             {
                 writer.Write(fileData, 0, fileData.Length);
                 writer.Flush(true);

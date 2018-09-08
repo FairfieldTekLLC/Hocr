@@ -94,7 +94,7 @@ namespace Hocr.ImageProcessors
             //' Hough Transformation
             Calc();
             //' Top 20 of the detected lines in the image.
-            var hl = GetTop(20);
+            HougLine[] hl = GetTop(20);
             //' Average angle of the lines
             for (i = 0; i < 19; i++)
             {
@@ -107,7 +107,7 @@ namespace Hocr.ImageProcessors
         //    ' Calculate the Count lines in the image with most points.
         private HougLine[] GetTop(int count)
         {
-            var hl = new HougLine[count];
+            HougLine[] hl = new HougLine[count];
             for (int i = 0; i < count; i++)
                 hl[i] = new HougLine();
             for (int i = 0; i < _cHMatrix.Length - 1; i++)
@@ -118,7 +118,7 @@ namespace Hocr.ImageProcessors
                     int j = count - 1;
                     while (j > 0 && hl[j].Count > hl[j - 1].Count)
                     {
-                        var tmp = hl[j];
+                        HougLine tmp = hl[j];
                         hl[j] = hl[j - 1];
                         hl[j - 1] = tmp;
                         j -= 1;
@@ -153,7 +153,7 @@ namespace Hocr.ImageProcessors
 
         private bool IsBlack(int x, int y)
         {
-            var c = _cBmp.GetPixel(x, y);
+            Color c = _cBmp.GetPixel(x, y);
             double luminance = c.R * 0.299 + c.G * 0.587 + c.B * 0.114;
             return luminance < 140;
         }
@@ -162,7 +162,7 @@ namespace Hocr.ImageProcessors
         {
             Bitmap tmp = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppRgb);
             tmp.SetResolution(bmp.HorizontalResolution, bmp.VerticalResolution);
-            var g = Graphics.FromImage(tmp);
+            Graphics g = Graphics.FromImage(tmp);
             try
             {
                 g.FillRectangle(Brushes.White, 0, 0, bmp.Width, bmp.Height);
