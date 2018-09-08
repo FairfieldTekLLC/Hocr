@@ -12,7 +12,6 @@ namespace Hocr.Pdf
 {
     internal class MyImageRenderListener : IRenderListener
     {
-        private PdfName _filter;
         public List<ParsedPageImage> ParsedImages = new List<ParsedPageImage>();
         public int PageNumber {
             get; set;
@@ -46,12 +45,10 @@ namespace Hocr.Pdf
                 byte[] bytes = image.GetImageAsBytes();
                 if (bytes == null)
                     return;
-                ParsedPageImage pi = new ParsedPageImage {IndirectReferenceNum = num, PdfImageObject = image};
-                _filter = (PdfName)image.Get(PdfName.FILTER);
-                pi.Image = image.GetDrawingImage();
+                ParsedPageImage pi = new ParsedPageImage {IndirectReferenceNum = num, PdfImageObject = image, Image = image.GetDrawingImage()};
                 using (MemoryStream ms = new MemoryStream(bytes))
                 {
-                    pi.Image = Image.FromStream(new MemoryStream(bytes));
+                    pi.Image = Image.FromStream(ms);
                     ParsedImages.Add(pi);
                 }
             }

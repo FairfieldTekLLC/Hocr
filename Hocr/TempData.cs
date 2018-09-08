@@ -20,7 +20,7 @@ namespace Hocr
             {
                 Directory.CreateDirectory(TemporaryFilePath);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("Cannot create Cache Folder");
             }

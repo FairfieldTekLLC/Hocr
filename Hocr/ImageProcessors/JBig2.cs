@@ -20,7 +20,7 @@ namespace Hocr.ImageProcessors
             {
                 File.Delete(f);
             }
-            catch (Exception x)
+            catch (Exception)
             {
                 //
             }
