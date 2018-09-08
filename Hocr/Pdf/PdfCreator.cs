@@ -28,27 +28,6 @@ namespace Hocr.Pdf
 
         private readonly OcrController _ocrController;
 
-        public PdfCreator(string newPdf,string tesseractPath)
-        {
-            _ocrController = new OcrController(tesseractPath);
-            PdfSettings = new PdfSettings();
-            PdfFilePath = newPdf;
-            SetupDocumentWriter(newPdf);
-            _hDoc = new HDocument();
-            
-        }
-
-        public PdfCreator(string newPdf, string hocrFilePath,string sessionName, string tesseractPath)
-        {
-            _ocrController = new OcrController(tesseractPath);
-            PdfSettings = new PdfSettings();
-            PdfFilePath = newPdf;
-            SetupDocumentWriter(newPdf);
-            _hDoc = new HDocument();
-
-            AddHocrFile(hocrFilePath,sessionName);
-        }
-
         public PdfCreator(PdfSettings settings, string newPdf, string tesseractPath)
         {
             _ocrController = new OcrController(tesseractPath);
@@ -80,23 +59,6 @@ namespace Hocr.Pdf
         }
 
         #endregion
-
-        public void AddHocrFile(string hocrFilePath,string sessionName)
-        {
-            HDocument doc = new HDocument();
-            doc.AddFile(hocrFilePath);
-
-            foreach (HPage p in doc.Pages)
-            {
-                Stream s = File.OpenRead(p.ImageFile);
-                System.Drawing.Image image = System.Drawing.Image.FromStream(s);
-                Guid objGuid = image.FrameDimensionsList[0];
-                FrameDimension frameDim = new FrameDimension(objGuid);
-                image.SelectActiveFrame(frameDim, p.ImageFrameNumber);
-                System.Drawing.Image img = ImageProcessor.GetAsBitmap(image, PdfSettings.Dpi);
-                AddPage(p, img,sessionName);
-            }
-        }
 
         /// <summary>
         ///     If adding an image directly, don't forget to call CreatePage
@@ -156,12 +118,7 @@ namespace Hocr.Pdf
             }
         }
         
-        public void AddPage(HPage page, System.Drawing.Image pageImage,string sessionName)
-        {
-            AddImage(pageImage,sessionName);
-            WriteUnderlayContent(page);
-        }
-
+      
         public void AddPage(string imagePath, PdfMode mode,string sessionName)
         {
             AddPage(System.Drawing.Image.FromFile(imagePath), mode,sessionName);
@@ -251,131 +208,7 @@ namespace Hocr.Pdf
             }
         }
 
-        public void AddPage(System.Drawing.Image image,string sessionName)
-        {
-            Guid objGuid = image.FrameDimensionsList[0];
-            FrameDimension frameDim = new FrameDimension(objGuid);
-            int frameCount = 0;
-            try
-            {
-                frameCount = image.GetFrameCount(frameDim);
-            }
-            catch (Exception)
-            {
-                Bitmap img;
-                if (image is Bitmap == false)
-                    img = ImageProcessor.GetAsBitmap(image,
-                        PdfSettings.Dpi);
-                else
-                    img = (Bitmap) image;
-                img.SetResolution(PdfSettings.Dpi, PdfSettings.Dpi);
 
-                AddImage(img,sessionName);
-            }
-            for (int i = 0; i < frameCount; i++)
-            {
-               Bitmap img;
-
-                image.SelectActiveFrame(frameDim, i);
-
-                if (image is Bitmap == false)
-                    img = ImageProcessor.GetAsBitmap(image, PdfSettings.Dpi);
-                else
-                    img = (Bitmap) image;
-
-                img.SetResolution(PdfSettings.Dpi, PdfSettings.Dpi);
-                AddImage(image,sessionName);
-                img.Dispose();
-            }
-        }
-
-        public void AddPdf(string pdfFile, string bookMarkDesc, string id)
-        {
-            if (!File.Exists(pdfFile))
-                return;
-
-            iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(pdfFile);
-
-            PdfContentByte cb = _writer.DirectContent;
-            PdfOutline root = cb.RootOutline;
-
-            for (int i = 1; i <= reader.NumberOfPages; i++)
-            {
-                if (i > reader.NumberOfPages)
-                    break;
-
-                PdfImportedPage page = _writer.GetImportedPage(reader, i);
-                _doc.SetPageSize(reader.GetPageSize(i));
-                _doc.NewPage();
-
-                int rot = reader.GetPageRotation(i);
-
-                if (rot == 90 || rot == 270)
-                    cb.AddTemplate(page, 0, -1.0F, 1.0F, 0, 0, reader.GetPageSizeWithRotation(i).Height);
-                else
-                    cb.AddTemplate(page, 1.0F, 0, 0, 1.0F, 0, 0);
-
-                if (i != 1)
-                    continue;
-
-                _doc.Add(new Chunk(bookMarkDesc).SetLocalDestination(id));
-                // ReSharper disable once ObjectCreationAsStatement
-                 new PdfOutline(root, PdfAction.GotoLocalPage(id, false), bookMarkDesc);
-            }
-            reader.Close();
-        }
-
-        public void AddPdf(string pdfFile)
-        {
-            if (!File.Exists(pdfFile))
-                return;
-
-            iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(pdfFile);
-
-            PdfContentByte cb = _writer.DirectContent;
-            for (int i = 1; i <= reader.NumberOfPages; i++)
-            {
-                if (i > reader.NumberOfPages)
-                    break;
-
-                _doc.NewPage();
-                PdfImportedPage page = _writer.GetImportedPage(reader, i);
-
-                int rot = reader.GetPageRotation(i);
-
-                if (rot == 90 || rot == 270)
-                    cb.AddTemplate(page, 0, -1.0F, 1.0F, 0, 0, reader.GetPageSizeWithRotation(i).Height);
-                else
-                    cb.AddTemplate(page, 1.0F, 0, 0, 1.0F, 0, 0);
-            }
-            reader.Close();
-        }
-
-        public void AddPdf(byte[] pdfPage)
-        {
-            iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(pdfPage);
-
-            PdfContentByte cb = _writer.DirectContent;
-            for (int i = 1; i <= reader.NumberOfPages; i++)
-            {
-                if (i > reader.NumberOfPages)
-                    break;
-
-                //set the current page size using the source page
-                _doc.SetPageSize(reader.GetPageSize(i));
-                _doc.NewPage();
-
-                PdfImportedPage page = _writer.GetImportedPage(reader, i);
-
-                int rot = reader.GetPageRotation(i);
-
-                if (rot == 90 || rot == 270)
-                    cb.AddTemplate(page, 0, -1.0F, 1.0F, 0, 0, reader.GetPageSizeWithRotation(i).Height);
-                else
-                    cb.AddTemplate(page, 1.0F, 0, 0, 1.0F, 0, 0);
-            }
-            reader.Close();
-        }
 
         private Image GetImageForPdf(Bitmap image,string sessionName)
         {

@@ -100,7 +100,6 @@
     <Compile Include="HocrElements\hWord.cs" />
     <Compile Include="HocrElements\Parser.cs" />
     <Compile Include="HocrElements\UnitFormat.cs" />
-    <Compile Include="ImageProcessors\Deskew.cs" />
     <Compile Include="ImageProcessors\GhostScript.cs" />
     <Compile Include="ImageProcessors\ImageProcessor.cs" />
     <Compile Include="ImageProcessors\JBig2.cs" />

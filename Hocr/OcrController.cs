@@ -33,9 +33,7 @@ namespace Hocr
         {
             string dataFolder = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             dataFolder = dataFolder + "/tessData";
-
             string dataPath = TempData.Instance.CreateDirectory(sessionName, dataFolder);
-
             string outputFile = imagePath.Replace(Path.GetExtension(imagePath), ".hocr");
             string inputFile = string.Concat('"', imagePath, '"');
             const string processName = "tesseract";
@@ -44,48 +42,7 @@ namespace Hocr
             RunCommand(processName, commandArgs);
             return outputFile + ".hocr";
         }
-
-        public HDocument CreateHocr(string language, Image image, string sessionName)
-        {
-            HDocument doc = new HDocument();
-
-            AddToDocument(language, image, ref doc, sessionName);
-            foreach (HPage page in doc.Pages)
-                doc.Text += page.Text + Environment.NewLine;
-            doc.CleanText();
-            return doc;
-        }
-
-        public string GetText(string language, string imagePath)
-        {
-            string outputFile = imagePath.Replace(Path.GetExtension(imagePath), ".txt");
-            string inputFile = string.Concat('"', imagePath, '"');
-            const string processName = "tesseract";
-            string oArg = '"' + outputFile + '"';
-            string commandArgs = string.Concat(inputFile, " ", oArg, " -l " + language + " -psm 1 ");
-
-            var startexe = new ProcessStartInfo(processName, commandArgs)
-            {
-                WorkingDirectory = Directory.GetCurrentDirectory(),
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-            };
-            using (var proc = Process.Start(startexe))
-            {
-                proc.WaitForExit();
-            }
-            GC.Collect();
-            
-            string text = File.ReadAllText(outputFile + ".txt");
-
-            File.Delete(outputFile + ".txt");
-            return text;
-        }
-
+        
         private void RunCommand(string processName, string commandArgs)
         {
             var startexe = new ProcessStartInfo(processName, commandArgs)
