@@ -3,8 +3,6 @@ using System.Text;
 
 namespace Hocr.HocrElements
 {
- 
-
     internal class BBox
     {
         public BBox()
