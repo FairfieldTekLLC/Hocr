@@ -9,7 +9,7 @@ namespace Hocr.ImageProcessors
 {
     internal class JBig2
     {
-        public string JBig2Path => 
+        public string JBig2Path =>
             '"' + Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), "jbig2.exe") + '"';
 
         private static void Cleanup(string f)
@@ -28,28 +28,24 @@ namespace Hocr.ImageProcessors
 
         private void CompressJBig2(string imagePath)
         {
-            Process p = new Process();
-            ProcessStartInfo info = new ProcessStartInfo
+            var startexe = new ProcessStartInfo()
             {
                 FileName = JBig2Path,
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
+                WorkingDirectory = Directory.GetCurrentDirectory(),
                 WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
                 Arguments = "-d -p -s -S -b " + '"' + imagePath.Replace(Path.GetExtension(imagePath), string.Empty) + '"' + " " + '"' + imagePath + '"'
             };
-            p.StartInfo = info;
-            try
+
+            using (var proc = Process.Start(startexe))
             {
-                p.Start();
-                p.WaitForExit();
+                proc.WaitForExit();
             }
-            catch (Exception x)
-            {
-                Debug.WriteLine(x.Message);
-                throw;
-            }
+            GC.Collect();
         }
 
         public Image ProcessImage(string imagePath)

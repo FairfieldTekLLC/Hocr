@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Hocr.ImageProcessors
 {
-    internal class GhostScript 
+    internal class GhostScript
     {
         public GhostScript(string path)
         {
@@ -16,7 +16,7 @@ namespace Hocr.ImageProcessors
         public const string Tiff12Nc = "tiff12nc";
         public const string Tiffg4 = "tiffg4";
 
-        public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum,string sessionName)
+        public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
             string outPut = GetOutPutFileName(sessionName, ".bmp");
             pdf = "\"" + pdf + "\"";
@@ -27,7 +27,7 @@ namespace Hocr.ImageProcessors
             return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
         }
 
-        public string ConvertPdftoJpeg(string pdf, int startPageNum, int endPageNum,string sessionName)
+        public string ConvertPdftoJpeg(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
             string outPut = GetOutPutFileName(sessionName, ".jpeg");
             pdf = "\"" + pdf + "\"";
@@ -55,7 +55,7 @@ namespace Hocr.ImageProcessors
             return outPut;
         }
 
-        public string ConvertPdftoPng(string pdf, int startPageNum, int endPageNum,string sessionName)
+        public string ConvertPdftoPng(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
             string outPut = GetOutPutFileName(sessionName, ".png");
             pdf = "\"" + pdf + "\"";
@@ -73,19 +73,30 @@ namespace Hocr.ImageProcessors
 
         private void RunCommand(string command)
         {
-            Process p = new Process();
-
-            ProcessStartInfo s = new ProcessStartInfo(_path, command)
+            var startexe = new ProcessStartInfo(_path, command)
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                //FileName = Path.Combine(Directory.GetCurrentDirectory(), "OnBaseImporterPdf.exe"),
+                WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
-                UseShellExecute = false
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
             };
-            p.StartInfo = s;
-            p.Start();
-            p.WaitForExit();
+            // Enter in the command line arguments, everything you would enter after the executable name itself
+            // Enter the executable to run, including the complete path
+            // Do you want to show a console window?
+            // int exitCode;
+
+
+            // Run the external process & wait for it to finish
+            using (var proc = Process.Start(startexe))
+            {
+                proc.WaitForExit();
+            }
             GC.Collect();
+
         }
     }
 }
