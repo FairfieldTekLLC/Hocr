@@ -76,7 +76,6 @@ namespace Hocr.ImageProcessors
             var startexe = new ProcessStartInfo(_path, command)
             {
                 WorkingDirectory = Directory.GetCurrentDirectory(),
-                //FileName = Path.Combine(Directory.GetCurrentDirectory(), "OnBaseImporterPdf.exe"),
                 WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
                 RedirectStandardError = true,
@@ -84,13 +83,6 @@ namespace Hocr.ImageProcessors
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
             };
-            // Enter in the command line arguments, everything you would enter after the executable name itself
-            // Enter the executable to run, including the complete path
-            // Do you want to show a console window?
-            // int exitCode;
-
-
-            // Run the external process & wait for it to finish
             using (var proc = Process.Start(startexe))
             {
                 proc.WaitForExit();

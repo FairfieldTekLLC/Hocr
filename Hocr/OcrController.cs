@@ -16,7 +16,7 @@ namespace Hocr
             _path = path;
         }
 
-        internal  void AddToDocument(string language, Image image, ref HDocument doc, string sessionName)
+        internal void AddToDocument(string language, Image image, ref HDocument doc, string sessionName)
         {
             Bitmap b = ImageProcessor.GetAsBitmap(image, (int)Math.Ceiling(image.HorizontalResolution));
 
@@ -25,11 +25,11 @@ namespace Hocr
             b.Save(imageFile, ImageFormat.Tiff);
 
 
-            string result = CreateHocr(language, imageFile,sessionName);
+            string result = CreateHocr(language, imageFile, sessionName);
             doc.AddFile(result);
         }
 
-        public  string CreateHocr(string language, string imagePath,string sessionName)
+        public string CreateHocr(string language, string imagePath, string sessionName)
         {
             string dataFolder = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             dataFolder = dataFolder + "/tessData";
@@ -45,62 +45,60 @@ namespace Hocr
             return outputFile + ".hocr";
         }
 
-        public  HDocument CreateHocr( string language, Image image, string sessionName)
+        public HDocument CreateHocr(string language, Image image, string sessionName)
         {
             HDocument doc = new HDocument();
 
-            AddToDocument( language, image, ref doc, sessionName);
+            AddToDocument(language, image, ref doc, sessionName);
             foreach (HPage page in doc.Pages)
                 doc.Text += page.Text + Environment.NewLine;
             doc.CleanText();
             return doc;
         }
 
-        public  string GetText( string language, string imagePath)
+        public string GetText(string language, string imagePath)
         {
             string outputFile = imagePath.Replace(Path.GetExtension(imagePath), ".txt");
             string inputFile = string.Concat('"', imagePath, '"');
             const string processName = "tesseract";
+            string oArg = '"' + outputFile + '"';
+            string commandArgs = string.Concat(inputFile, " ", oArg, " -l " + language + " -psm 1 ");
 
-          
-                string oArg = '"' + outputFile + '"';
-                string commandArgs = string.Concat(inputFile, " ", oArg, " -l " + language + " -psm 1 ");
-          
-            Process p = new Process();
-            ProcessStartInfo s = new ProcessStartInfo(processName, commandArgs)
+            var startexe = new ProcessStartInfo(processName, commandArgs)
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
-                UseShellExecute = false
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
             };
-            p.StartInfo = s;
-
-            p.Start();
-            p.WaitForExit();
+            using (var proc = Process.Start(startexe))
+            {
+                proc.WaitForExit();
+            }
             GC.Collect();
-
+            
             string text = File.ReadAllText(outputFile + ".txt");
 
             File.Delete(outputFile + ".txt");
             return text;
         }
 
-        private  void RunCommand(string processName, string commandArgs)
+        private void RunCommand(string processName, string commandArgs)
         {
-            Process p = new Process();
-
-            ProcessStartInfo s =
-                new ProcessStartInfo(processName, commandArgs)
-                {
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true,
-                    UseShellExecute = true
-                };
-            p.StartInfo = s;
-            s.WorkingDirectory = _path;
-            p.Start();
-            p.WaitForExit();
+            var startexe = new ProcessStartInfo(processName, commandArgs)
+            {
+                WorkingDirectory = _path,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                UseShellExecute = true,
+            };
+            using (Process proc = Process.Start(startexe))
+            {
+                proc.WaitForExit();
+            }
             GC.Collect();
         }
     }
