@@ -22,11 +22,16 @@ So, to run this, run the installers (or download them yourself)
 Example Usage:
 
 
-
-        static async void Example(byte[] data,string outfile)
+ static async void Example(byte[] data, string outfile)
         {
-            var odata = await Task.Run(() => comp.CreateSearchablePdf(data));
-            File.WriteAllBytes(outfile,odata);
+            byte[] odata = await Task.Run(() => comp.CreateSearchablePdf(data, new PdfMeta()
+            {
+                Author = "Vince",
+                KeyWords = string.Empty,
+                Subject = string.Empty,
+                Title = string.Empty,
+            }));
+            File.WriteAllBytes(outfile, odata);
             Console.WriteLine("Finished " + outfile);
             FileCounter = FileCounter - 1;
             if (FileCounter == 0)
@@ -43,17 +48,31 @@ Example Usage:
             //The folder where Tesseract is installed
             const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
 
-            comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder);
+
+            PdfCompressorSettings PdfSettings = new PdfCompressorSettings
+            {
+                ImageType = PdfImageType.JBig2,
+                Dpi = 400,
+                ImageQuality = 100,
+                WriteTextMode = WriteTextMode.Word
+            };
+
+            comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, PdfSettings);
             comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
 
-            var data = File.ReadAllBytes(@"Test1.pdf");
-            var data1 = File.ReadAllBytes(@"Test2.pdf");
+
+            byte[] data = File.ReadAllBytes(@"Test1.pdf");
+            byte[] data1 = File.ReadAllBytes(@"Test2.pdf");
+            byte[] data2 = File.ReadAllBytes(@"Test3.pdf");
 
             Example(data, @"Test1_ocr.pdf");
             Console.WriteLine("Started Test 1");
 
             Example(data1, @"Test2_ocr.pdf");
             Console.WriteLine("Starting Test 2");
+
+            Example(data2, @"Test3_ocr.pdf");
+            Console.WriteLine("Starting Test 3");
 
             int counter = 0;
             while (_running)
@@ -66,5 +85,6 @@ Example Usage:
             Console.ReadLine();
 
         }
+
 
 Special Thanks to Koolprasadd for his original article at:  https://tech.io/playgrounds/10058/scanned-pdf-to-ocr-textsearchable-pdf-using-c
