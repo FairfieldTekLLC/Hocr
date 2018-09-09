@@ -20,9 +20,24 @@ So, to run this, run the installers (or download them yourself)
 * Ghost Script: https://www.ghostscript.com/
 
 Example Usage:
+```C#
+using System;
+using System.Data;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Hocr.Enums;
+using Hocr.Pdf;
 
+namespace Hocr.Cmd
+{
+    class Program
+    {
+        private static bool _running = true;
 
- static async void Example(byte[] data, string outfile)
+        private static int FileCounter = 3;
+
+        static async void Example(byte[] data, string outfile)
         {
             byte[] odata = await Task.Run(() => comp.CreateSearchablePdf(data, new PdfMeta()
             {
@@ -86,5 +101,18 @@ Example Usage:
 
         }
 
+
+        private static void Compressor_OnExceptionOccurred(PdfCompressor c, Exception x)
+        {
+            Console.WriteLine("Exception Occured! ");
+            Console.WriteLine(x.Message);
+            Console.WriteLine(x.StackTrace);
+            _running = false;
+        }
+
+
+    }
+}
+```
 
 Special Thanks to Koolprasadd for his original article at:  https://tech.io/playgrounds/10058/scanned-pdf-to-ocr-textsearchable-pdf-using-c
