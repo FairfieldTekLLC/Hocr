@@ -48,8 +48,6 @@ namespace Hocr.ImageProcessors
             {
                 proc.WaitForExit();
             }
-            GC.Collect();
-
         }
     }
 }

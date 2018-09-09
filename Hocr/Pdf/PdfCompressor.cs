@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Hocr.Enums;
@@ -19,32 +20,28 @@ namespace Hocr.Pdf
             get;
         }
 
-        public PdfCompressor(string ghostScriptPath, string tesseractPath, PdfSettings settings = null)
+        public PdfCompressor(string ghostScriptPath, string tesseractPath, PdfCompressorSettings settings = null)
         {
             TesseractPath = tesseractPath;
             GhostScriptPath = ghostScriptPath;
-            PdfSettings = settings ?? new PdfSettings();
+            PdfSettings = settings ?? new PdfCompressorSettings();
         }
         
-        public PdfMode Mode {
-            get; set;
-        }
+      
+        public PdfCompressorSettings PdfSettings {get; }
         
-        public PdfSettings PdfSettings {
-            get; set;
-        }
-        
-        private bool CompressAndOcr(string sessionName, string inputFileName, string outputFileName)
+        private bool CompressAndOcr(string sessionName, string inputFileName, string outputFileName,PdfMeta meta)
         {
 
             PdfReader reader = new PdfReader(inputFileName, GhostScriptPath);
-            PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath)
+            PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath,meta)
             {
                 PdfSettings =
                 {
                     WriteTextMode = WriteTextMode.Word
                 }
             };
+
             try
             {
                 for (int i = 1; i <= reader.PageCount; i++)
@@ -66,8 +63,6 @@ namespace Hocr.Pdf
                 writer.SaveAndClose();
                 writer.Dispose();
                 reader.Dispose();
-                GC.Collect();
-
                 OnExceptionOccurred?.Invoke(this, x);
             }
             return false;
@@ -80,7 +75,7 @@ namespace Hocr.Pdf
         /// </summary>
         public event PreProcessImage OnPreProcessImage;
 
-        public async Task<byte[]> CreateSearchablePdf(byte[] fileData)
+        public async Task<byte[]> CreateSearchablePdf(byte[] fileData,PdfMeta metaData)
         {
             string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
@@ -94,7 +89,7 @@ namespace Hocr.Pdf
                 writer.Write(fileData, 0, fileData.Length);
                 writer.Flush(true);
             }
-            bool check = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath)));
+            bool check = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath,metaData)));
             byte[] outFile = File.ReadAllBytes(outputDataFilePath);
             TempData.Instance.DestroySession(sessionName);
             return outFile;

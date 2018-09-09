@@ -4,9 +4,9 @@ using iTextSharp.text;
 namespace Hocr.Pdf
 {
    
-    public  class PdfSettings
+    public  class PdfCompressorSettings
     {
-        public PdfSettings()
+        public PdfCompressorSettings()
         {
             Dpi = 600;
     
@@ -18,7 +18,7 @@ namespace Hocr.Pdf
             Language = "eng";
         }
 
-        public string Author { get; set; }
+        //public string Author { get; set; }
         public int Dpi { get; set; }
 
         /// <summary>
@@ -28,11 +28,11 @@ namespace Hocr.Pdf
 
         public long ImageQuality { get; set; }
         public PdfImageType ImageType { get; set; }
-        public string Keywords { get; set; }
+        //public string Keywords { get; set; }
         public string Language { get; set; }
         public Rectangle PdfPageSize { get; set; }
-        public string Subject { get; set; }
-        public string Title { get; set; }
+        //public string Subject { get; set; }
+        //public string Title { get; set; }
 
         /// <summary>
         ///     write unlerlay text by lin e or word. by line creates smalled pdf files. word is ignored if OcrMode == cuneiform

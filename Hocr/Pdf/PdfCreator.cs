@@ -10,7 +10,6 @@ using Hocr.HocrElements;
 using Hocr.ImageProcessors;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-using Font = iTextSharp.text.Font;
 using Image = iTextSharp.text.Image;
 using Rectangle = iTextSharp.text.Rectangle;
 namespace Hocr.Pdf
@@ -28,17 +27,21 @@ namespace Hocr.Pdf
 
         private readonly OcrController _ocrController;
 
-        public PdfCreator(PdfSettings settings, string newPdf, string tesseractPath)
+        public PdfCreator(PdfCompressorSettings settings, string newPdf, string tesseractPath, PdfMeta meta)
         {
             _ocrController = new OcrController(tesseractPath);
             PdfSettings = settings;
             PdfFilePath = newPdf;
-            SetupDocumentWriter(newPdf);
+            SetupDocumentWriter(newPdf, meta.Author, meta.Title, meta.Subject, meta.KeyWords);
             _hDoc = new HDocument();
         }
 
-        public string PdfFilePath { get; }
-        public PdfSettings PdfSettings { get; set; }
+        public string PdfFilePath {
+            get;
+        }
+        public PdfCompressorSettings PdfSettings {
+            get; set;
+        }
 
         #region IDisposable Members
 
@@ -50,7 +53,6 @@ namespace Hocr.Pdf
                 _writer.Dispose();
                 _doc = null;
                 _writer = null;
-                GC.Collect();
             }
             catch
             {
@@ -65,7 +67,7 @@ namespace Hocr.Pdf
         /// </summary>
         /// <param name="image"></param>
         /// <param name="sessionName"></param>
-        private void AddImage(System.Drawing.Image image,string sessionName)
+        private void AddImage(System.Drawing.Image image, string sessionName)
         {
             try
             {
@@ -76,7 +78,7 @@ namespace Hocr.Pdf
                 }
 
                 Bitmap bmp = ImageProcessor.GetAsBitmap(image, PdfSettings.Dpi);
-                Image i = GetImageForPdf(bmp,sessionName);
+                Image i = GetImageForPdf(bmp, sessionName);
                 AddImage(i);
             }
             catch (Exception x)
@@ -109,7 +111,6 @@ namespace Hocr.Pdf
                 image.ScaleAbsolute(_doc.PageSize.Width, _doc.PageSize.Height);
                 _doc.NewPage();
                 _doc.Add(image);
-                GC.Collect();
             }
             catch (Exception x)
             {
@@ -117,14 +118,14 @@ namespace Hocr.Pdf
                 throw;
             }
         }
-        
-      
-        public void AddPage(string imagePath, PdfMode mode,string sessionName)
+
+
+        public void AddPage(string imagePath, PdfMode mode, string sessionName)
         {
-            AddPage(System.Drawing.Image.FromFile(imagePath), mode,sessionName);
+            AddPage(System.Drawing.Image.FromFile(imagePath), mode, sessionName);
         }
 
-        public void AddPage(System.Drawing.Image image, PdfMode mode,string sessionName)
+        public void AddPage(System.Drawing.Image image, PdfMode mode, string sessionName)
         {
             Guid objGuid = image.FrameDimensionsList[0];
             FrameDimension frameDim = new FrameDimension(objGuid);
@@ -139,23 +140,23 @@ namespace Hocr.Pdf
                 if (image is Bitmap == false)
                     img = ImageProcessor.GetAsBitmap(image, PdfSettings.Dpi);
                 else
-                    img = (Bitmap) image;
+                    img = (Bitmap)image;
 
                 img.SetResolution(PdfSettings.Dpi, PdfSettings.Dpi);
 
                 switch (mode)
                 {
                     case PdfMode.ImageOnly:
-                        AddImage(image,sessionName);
+                        AddImage(image, sessionName);
                         break;
                     case PdfMode.Ocr:
                         try
                         {
-                            AddImage(image,sessionName);
+                            AddImage(image, sessionName);
 
                             if (OnProcessImageForOcr != null)
                                 img = OnProcessImageForOcr(img);
-                            _ocrController.AddToDocument( PdfSettings.Language, image, ref _hDoc,sessionName);
+                            _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
                             WriteUnderlayContent(page);
                         }
@@ -168,7 +169,7 @@ namespace Hocr.Pdf
                         try
                         {
                             _doc.NewPage();
-                            _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc,sessionName);
+                            _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
                             WriteDirectContent(page);
                         }
@@ -180,9 +181,9 @@ namespace Hocr.Pdf
                     case PdfMode.DrawBlocks:
                         try
                         {
-                            _ocrController.AddToDocument( PdfSettings.Language, image, ref _hDoc,sessionName);
+                            _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
-                            WritePageDrawBlocks(image, page,sessionName);
+                            WritePageDrawBlocks(image, page, sessionName);
                         }
                         catch (Exception)
                         {
@@ -192,9 +193,9 @@ namespace Hocr.Pdf
                     case PdfMode.Debug:
                         try
                         {
-                            _ocrController.AddToDocument( PdfSettings.Language, image, ref _hDoc,sessionName);
+                            _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
-                            WritePageDrawBlocks(image, page,sessionName);
+                            WritePageDrawBlocks(image, page, sessionName);
                             WriteDirectContent(page);
                         }
                         catch (Exception)
@@ -210,7 +211,7 @@ namespace Hocr.Pdf
 
 
 
-        private Image GetImageForPdf(Bitmap image,string sessionName)
+        private Image GetImageForPdf(Bitmap image, string sessionName)
         {
             Image i = null;
 
@@ -260,7 +261,7 @@ namespace Hocr.Pdf
             }
         }
 
-        private void SetupDocumentWriter(string fileName)
+        private void SetupDocumentWriter(string fileName, string author, string title, string subject, string keywords)
         {
             _doc = new Document();
 
@@ -270,65 +271,65 @@ namespace Hocr.Pdf
             {
                 _writer = PdfWriter.GetInstance(_doc, new FileStream(fileName, FileMode.Create));
             }
-            catch (Exception )
+            catch (Exception)
             {
                 //Throw away.
             }
-            
+
 
             _writer.SetMargins(0, 0, 0, 0);
             _doc.Open();
 
             if (PdfSettings == null)
                 return;
-            _doc.AddAuthor(PdfSettings.Author);
-            _doc.AddTitle(PdfSettings.Title);
-            _doc.AddSubject(PdfSettings.Subject);
-            _doc.AddKeywords(PdfSettings.Keywords);
+            _doc.AddAuthor(author);
+            _doc.AddTitle(title);
+            _doc.AddSubject(subject);
+            _doc.AddKeywords(keywords);
         }
 
         private void WriteDirectContent(HPage page)
         {
             List<HLine> allLines = page.Paragraphs.SelectMany(para => para.Lines).ToList();
             foreach (HParagraph para in page.Paragraphs)
-            foreach (HLine line in para.Lines)
-            {
-                line.CleanText();
-                if (line.Text.Trim() == string.Empty)
-                    continue;
-
-                BBox b = BBox.ConvertBBoxToPoints(line.BBox, PdfSettings.Dpi);
-
-                if (b.Height > 28)
-                    continue;
-
-                PdfContentByte cb = _writer.DirectContent;
-
-                BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
-                Font font = new Font(baseFont);
-                if (!string.IsNullOrEmpty(PdfSettings.FontName))
+                foreach (HLine line in para.Lines)
                 {
-                    string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), PdfSettings.FontName);
-                    baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                    font = new Font(baseFont);
+                    line.CleanText();
+                    if (line.Text.Trim() == string.Empty)
+                        continue;
+
+                    BBox b = BBox.ConvertBBoxToPoints(line.BBox, PdfSettings.Dpi);
+
+                    if (b.Height > 28)
+                        continue;
+
+                    PdfContentByte cb = _writer.DirectContent;
+
+                    BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
+                    //Font font = new Font(baseFont);
+                    if (!string.IsNullOrEmpty(PdfSettings.FontName))
+                    {
+                        string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), PdfSettings.FontName);
+                        baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                        //font = new Font(baseFont);
+                    }
+
+                    //float h = 9;
+
+                    float fontSize = allLines.Select(x => x.BBox.Height).Average() / PdfSettings.Dpi * 72.0f; // Math.Ceiling(b.Height);
+
+                    if ((int)fontSize == 0)
+                        fontSize = 2;
+
+                    cb.BeginText();
+                    cb.SetFontAndSize(baseFont, (int)Math.Floor(fontSize) - 1);
+                    cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height);
+                    cb.ShowText(line.Text);
+                    cb.EndText();
                 }
-
-                float h = 9;
-
-                float fontSize = allLines.Select(x => x.BBox.Height).Average() / PdfSettings.Dpi * 72.0f; // Math.Ceiling(b.Height);
-
-                if ((int)fontSize == 0)
-                    fontSize = 2;
-
-                cb.BeginText();
-                cb.SetFontAndSize(baseFont, (int) Math.Floor(fontSize) - 1);
-                cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height);
-                cb.ShowText(line.Text);
-                cb.EndText();
-            }
         }
 
-        private void WritePageDrawBlocks(System.Drawing.Image img, HPage page,string sessionName)
+        private void WritePageDrawBlocks(System.Drawing.Image img, HPage page, string sessionName)
         {
             System.Drawing.Image himage = img;
 
@@ -346,144 +347,145 @@ namespace Hocr.Pdf
             foreach (HParagraph para in page.Paragraphs)
             {
                 bg.DrawRectangle(gpen,
-                    new System.Drawing.Rectangle(new Point((int) para.BBox.Left, (int) para.BBox.Top),
-                        new Size((int) para.BBox.Width, (int) para.BBox.Height)));
+                    new System.Drawing.Rectangle(new Point((int)para.BBox.Left, (int)para.BBox.Top),
+                        new Size((int)para.BBox.Width, (int)para.BBox.Height)));
 
                 foreach (HLine line in para.Lines)
                 {
                     foreach (HWord word in line.Words)
                         bg.DrawRectangle(rpen,
-                            new System.Drawing.Rectangle(new Point((int) word.BBox.Left, (int) word.BBox.Top),
-                                new Size((int) word.BBox.Width, (int) word.BBox.Height)));
+                            new System.Drawing.Rectangle(new Point((int)word.BBox.Left, (int)word.BBox.Top),
+                                new Size((int)word.BBox.Width, (int)word.BBox.Height)));
                     bg.DrawRectangle(bpen,
-                        new System.Drawing.Rectangle(new Point((int) line.BBox.Left, (int) line.BBox.Top),
-                            new Size((int) line.BBox.Width, (int) line.BBox.Height)));
+                        new System.Drawing.Rectangle(new Point((int)line.BBox.Left, (int)line.BBox.Top),
+                            new Size((int)line.BBox.Width, (int)line.BBox.Height)));
                 }
             }
             IList<HLine> combinedLines = page.CombineSameRowLines();
             foreach (HLine l in combinedLines.Where(x => x.LineWasCombined))
                 bg.DrawRectangle(ppen,
-                    new System.Drawing.Rectangle(new Point((int) l.BBox.Left, (int) l.BBox.Top), new Size((int) l.BBox.Width, (int) l.BBox.Height)));
+                    new System.Drawing.Rectangle(new Point((int)l.BBox.Left, (int)l.BBox.Top), new Size((int)l.BBox.Width, (int)l.BBox.Height)));
 
-            AddImage(rectCanvas,sessionName);
+            AddImage(rectCanvas, sessionName);
+        }
+
+        private void WriteUnderlayContent(HOcrClass c, BaseFont baseFont)
+        {
+            BBox b = c.BBox;
+            PdfContentByte cb = _writer.DirectContentUnder;
+            cb.BeginText();
+            cb.SetFontAndSize(baseFont, c.BBox.Height > 0 ? c.BBox.Height : 2);
+            if (b.Format == UnitFormat.Point)
+                cb.SetTextMatrix(b.Left, b.Top - b.Height + 2);
+            else
+                cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
+            cb.ShowText(c.Text.Trim());
+            cb.EndText();
         }
 
         public void WriteUnderlayContent(IList<HOcrClass> locations)
         {
             BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
-            Font font = new Font(baseFont);
+
+            //new Font(baseFont);
             if (!string.IsNullOrEmpty(PdfSettings.FontName))
             {
                 string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), PdfSettings.FontName);
                 baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                font = new Font(baseFont);
-            }
 
+                //new Font(baseFont);
+            }
             foreach (HOcrClass c in locations)
-            {
-                BBox b = c.BBox;
-
-                PdfContentByte cb = _writer.DirectContentUnder;
-
-                cb.BeginText();
-                cb.SetFontAndSize(baseFont, c.BBox.Height > 0 ? c.BBox.Height : 2);
-                if (b.Format == UnitFormat.Point)
-                    cb.SetTextMatrix(b.Left, b.Top - b.Height + 2);
-                else
-                    cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
-
-                cb.ShowText(c.Text.Trim());
-                cb.EndText();
-            }
+                WriteUnderlayContent(c, baseFont);
         }
 
         private void WriteUnderlayContent(HPage page)
         {
-            
-            foreach (HParagraph para in page.Paragraphs)
-            foreach (HLine line in para.Lines)
-            {
-                if (PdfSettings.WriteTextMode == WriteTextMode.Word)
-                {
-                    line.AlignTops();
 
-                    foreach (HWord c in line.Words)
+            foreach (HParagraph para in page.Paragraphs)
+                foreach (HLine line in para.Lines)
+                {
+                    if (PdfSettings.WriteTextMode == WriteTextMode.Word)
                     {
-                        c.CleanText();
-                        BBox b = BBox.ConvertBBoxToPoints(c.BBox, PdfSettings.Dpi);
+                        line.AlignTops();
+
+                        foreach (HWord c in line.Words)
+                        {
+                            c.CleanText();
+                            BBox b = BBox.ConvertBBoxToPoints(c.BBox, PdfSettings.Dpi);
+
+                            if (b.Height > 28)
+                                continue;
+                            PdfContentByte cb = _writer.DirectContentUnder;
+
+                            BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
+                            //Font font = new Font(baseFont);
+                            if (!string.IsNullOrEmpty(PdfSettings.FontName))
+                            {
+                                string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), PdfSettings.FontName);
+                                baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                                //font = new Font(baseFont);
+                            }
+
+                            cb.BeginText();
+                            cb.SetFontAndSize(baseFont, b.Height > 0 ? b.Height : 2);
+                            cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
+                            cb.SetWordSpacing(DocWriter.SPACE);
+                            cb.ShowText(c.Text.Trim() + " ");
+                            cb.EndText();
+                        }
+                    }
+
+                    if (PdfSettings.WriteTextMode == WriteTextMode.Line)
+                    {
+                        line.CleanText();
+                        BBox b = BBox.ConvertBBoxToPoints(line.BBox, PdfSettings.Dpi);
 
                         if (b.Height > 28)
                             continue;
+
+                        //BBox lineBox = BBox.ConvertBBoxToPoints(line.BBox, PdfSettings.Dpi);
                         PdfContentByte cb = _writer.DirectContentUnder;
 
                         BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
-                        Font font = new Font(baseFont);
-                        if (!string.IsNullOrEmpty(PdfSettings.FontName))
-                        {
-                            string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), PdfSettings.FontName);
-                            baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                            font = new Font(baseFont);
-                        }
+                        //Font font = new Font(baseFont);
 
                         cb.BeginText();
                         cb.SetFontAndSize(baseFont, b.Height > 0 ? b.Height : 2);
                         cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
-                        cb.SetWordSpacing(DocWriter.SPACE);
-                        cb.ShowText(c.Text.Trim() + " ");
+                        cb.SetWordSpacing(.25f);
+                        cb.ShowText(line.Text);
                         cb.EndText();
                     }
-                }
 
-                if (PdfSettings.WriteTextMode == WriteTextMode.Line)
-                {
-                    line.CleanText();
-                    BBox b = BBox.ConvertBBoxToPoints(line.BBox, PdfSettings.Dpi);
-
-                    if (b.Height > 28)
+                    if (PdfSettings.WriteTextMode != WriteTextMode.Character)
                         continue;
-
-                    BBox lineBox = BBox.ConvertBBoxToPoints(line.BBox, PdfSettings.Dpi);
-                    PdfContentByte cb = _writer.DirectContentUnder;
-
-                    BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, false);
-                    Font font = new Font(baseFont);
-
-                    cb.BeginText();
-                    cb.SetFontAndSize(baseFont, b.Height > 0 ? b.Height : 2);
-                    cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
-                    cb.SetWordSpacing(.25f);
-                    cb.ShowText(line.Text);
-                    cb.EndText();
-                }
-
-                if (PdfSettings.WriteTextMode != WriteTextMode.Character)
-                    continue;
-                {
-                    line.AlignTops();
-
-                    foreach (HWord word in line.Words)
                     {
-                        word.AlignCharacters();
-                        foreach (HChar c in word.Characters)
+                        line.AlignTops();
+
+                        foreach (HWord word in line.Words)
                         {
-                            BBox b = BBox.ConvertBBoxToPoints(c.BBox, PdfSettings.Dpi);
-                            BBox lineBox = BBox.ConvertBBoxToPoints(c.BBox, PdfSettings.Dpi);
-                            PdfContentByte  cb = _writer.DirectContentUnder;
+                            word.AlignCharacters();
+                            foreach (HChar c in word.Characters)
+                            {
+                                BBox b = BBox.ConvertBBoxToPoints(c.BBox, PdfSettings.Dpi);
+                                //BBox lineBox = BBox.ConvertBBoxToPoints(c.BBox, PdfSettings.Dpi);
+                                PdfContentByte cb = _writer.DirectContentUnder;
 
-                            BaseFont baseFont = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.WINANSI, false);
-                            Font font = new Font(baseFont);
+                                BaseFont baseFont = BaseFont.CreateFont(BaseFont.TIMES_ROMAN, BaseFont.WINANSI, false);
+                                //Font font = new Font(baseFont);
 
-                            cb.BeginText();
-                            cb.SetFontAndSize(baseFont, b.Height > 0 ? b.Height : 2);
+                                cb.BeginText();
+                                cb.SetFontAndSize(baseFont, b.Height > 0 ? b.Height : 2);
 
-                            cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
-                            cb.SetCharacterSpacing(-1f);
-                            cb.ShowText(c.Text.Trim());
-                            cb.EndText();
+                                cb.SetTextMatrix(b.Left, _doc.PageSize.Height - b.Top - b.Height + 2);
+                                cb.SetCharacterSpacing(-1f);
+                                cb.ShowText(c.Text.Trim());
+                                cb.EndText();
+                            }
                         }
                     }
                 }
-            }
         }
     }
 }

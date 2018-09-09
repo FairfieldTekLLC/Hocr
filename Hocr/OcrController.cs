@@ -56,7 +56,6 @@ namespace Hocr
             {
                 proc.WaitForExit();
             }
-            GC.Collect();
         }
     }
 }

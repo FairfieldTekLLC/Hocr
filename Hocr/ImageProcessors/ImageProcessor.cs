@@ -57,7 +57,7 @@ namespace Hocr.ImageProcessors
 
             int height = source.Height;
             int width = source.Width;
-            int threshold = 580;
+            const int threshold = 580;
 
             // Iterate lines
             for (int y = 0; y < height; y++)
@@ -74,7 +74,7 @@ namespace Hocr.ImageProcessors
                     //                           B                             G                              R
                     int pixelTotal = sourceBuffer[sourceIndex] + sourceBuffer[sourceIndex + 1] + sourceBuffer[sourceIndex + 2];
                     if (pixelTotal > threshold)
-                        destinationValue += (byte) pixelValue;
+                        destinationValue += (byte)pixelValue;
                     if (pixelValue == 1)
                     {
                         destinationBuffer[destinationIndex] = destinationValue;
@@ -106,15 +106,17 @@ namespace Hocr.ImageProcessors
             return destination;
         }
 
-   
+
         public static Image ConvertToCcittFaxTiff(Image image)
         {
             Bitmap bmg = GetAsBitmap(image, 300);
             Bitmap bitonalBmp = ConvertToBitonal(bmg);
             ImageCodecInfo codecInfo = GetCodecInfoForName("TIFF");
-            EncoderParameters encoderParams = new EncoderParameters(2);
-            encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 08L);
-            encoderParams.Param[1] = new EncoderParameter(Encoder.SaveFlag, (long) EncoderValue.CompressionCCITT4);
+            EncoderParameters encoderParams = new EncoderParameters(2)
+            {
+                Param = {[0] = new EncoderParameter(Encoder.Quality, 08L),
+                [1] = new EncoderParameter(Encoder.SaveFlag, (long) EncoderValue.CompressionCCITT4)}
+            };
 
             MemoryStream ms = new MemoryStream();
             bitonalBmp.Save(ms, codecInfo, encoderParams);
@@ -125,11 +127,11 @@ namespace Hocr.ImageProcessors
 
         public static Image ConvertToImage(Image imageToConvert, string codecName, long quality, int dpi)
         {
-            Bitmap bmp = GetAsBitmap(imageToConvert, dpi); 
+            Bitmap bmp = GetAsBitmap(imageToConvert, dpi);
             ImageCodecInfo codecInfo = GetCodecInfoForName(codecName);
             EncoderParameters encoderParams = new EncoderParameters(1)
             {
-                Param = {[0] = new EncoderParameter(Encoder.Quality, quality)}
+                Param = { [0] = new EncoderParameter(Encoder.Quality, quality) }
             };
             Bitmap newBitmap = new Bitmap(bmp);
             newBitmap.SetResolution(dpi, dpi);
@@ -140,7 +142,7 @@ namespace Hocr.ImageProcessors
             return Image.FromStream(ms);
         }
 
-      
+
         public static Bitmap GetAsBitmap(Image image, int dpi)
         {
             try
@@ -162,12 +164,14 @@ namespace Hocr.ImageProcessors
         public static ImageCodecInfo GetCodecInfoForName(string codecType)
         {
             ImageCodecInfo[] info = ImageCodecInfo.GetImageEncoders();
-            return (from t in info let enumName = codecType
-                    where t.FormatDescription.Equals(enumName) select t).FirstOrDefault();
+            return (from t in info
+                    let enumName = codecType
+                    where t.FormatDescription.Equals(enumName)
+                    select t).FirstOrDefault();
         }
 
-       
 
-      
+
+
     }
 }

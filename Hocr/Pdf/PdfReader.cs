@@ -79,6 +79,7 @@ namespace Hocr.Pdf
             }
             catch (Exception)
             {
+                Console.WriteLine("Getting page via GhostScript");
                 return GetPageImageWithGhostScript(pageNumber, sessionName);
             }
             return null;

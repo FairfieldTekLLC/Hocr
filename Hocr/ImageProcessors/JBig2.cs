@@ -12,20 +12,6 @@ namespace Hocr.ImageProcessors
         public string JBig2Path =>
             '"' + Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), "jbig2.exe") + '"';
 
-        private static void Cleanup(string f)
-        {
-            if (!File.Exists(f))
-                return;
-            try
-            {
-                File.Delete(f);
-            }
-            catch (Exception)
-            {
-                //
-            }
-        }
-
         private void CompressJBig2(string imagePath)
         {
             var startexe = new ProcessStartInfo()
@@ -45,7 +31,6 @@ namespace Hocr.ImageProcessors
             {
                 proc.WaitForExit();
             }
-            GC.Collect();
         }
 
         public Image ProcessImage(string imagePath)
@@ -56,10 +41,6 @@ namespace Hocr.ImageProcessors
             string symIndexFilePath = newImage.Replace(Path.GetExtension(newImage), ".0000");
             CompressJBig2(newImage);
             Image i = Image.GetInstance(img.Width, img.Height, File.ReadAllBytes(symIndexFilePath), File.ReadAllBytes(symFilePath));
-            Cleanup(symFilePath);
-            Cleanup(symIndexFilePath);
-            Cleanup(newImage);
-            GC.Collect();
             return i;
         }
 

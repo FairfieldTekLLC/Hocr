@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Hocr.Enums;
 using Hocr.Pdf;
 
 namespace Hocr.Cmd
@@ -13,10 +14,16 @@ namespace Hocr.Cmd
 
         private static int FileCounter = 3;
 
-        static async void Example(byte[] data,string outfile)
+        static async void Example(byte[] data, string outfile)
         {
-            byte[] odata = await Task.Run(() => comp.CreateSearchablePdf(data));
-            File.WriteAllBytes(outfile,odata);
+            byte[] odata = await Task.Run(() => comp.CreateSearchablePdf(data, new PdfMeta()
+            {
+                Author = "Vince",
+                KeyWords = string.Empty,
+                Subject = string.Empty,
+                Title = string.Empty,
+            }));
+            File.WriteAllBytes(outfile, odata);
             Console.WriteLine("Finished " + outfile);
             FileCounter = FileCounter - 1;
             if (FileCounter == 0)
@@ -34,9 +41,17 @@ namespace Hocr.Cmd
             const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
 
 
-            comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder);
+            PdfCompressorSettings PdfSettings = new PdfCompressorSettings
+            {
+                ImageType = PdfImageType.JBig2,
+                Dpi = 400,
+                ImageQuality = 100,
+                WriteTextMode = WriteTextMode.Word
+            };
+
+            comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, PdfSettings);
             comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
-            
+
 
             byte[] data = File.ReadAllBytes(@"Test1.pdf");
             byte[] data1 = File.ReadAllBytes(@"Test2.pdf");
@@ -62,7 +77,7 @@ namespace Hocr.Cmd
             Console.ReadLine();
 
         }
-        
+
 
         private static void Compressor_OnExceptionOccurred(PdfCompressor c, Exception x)
         {
