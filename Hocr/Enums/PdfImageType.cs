@@ -24,10 +24,6 @@ namespace Hocr.Enums
         /// Convert images to Png
         /// </summary>
         Png,
-        ///// <summary>
-        ///// Use JBIG2 Currently not 100%
-        ///// </summary>
-        //JBig2,
         /// <summary>
         /// Convert images to GIF
         /// </summary>

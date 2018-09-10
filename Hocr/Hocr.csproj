@@ -103,7 +103,6 @@
     <Compile Include="HocrElements\UnitFormat.cs" />
     <Compile Include="ImageProcessors\GhostScript.cs" />
     <Compile Include="ImageProcessors\ImageProcessor.cs" />
-    <Compile Include="ImageProcessors\JBig2.cs" />
     <Compile Include="OcrController.cs" />
     <Compile Include="Pdf\MyImageRenderListener.cs" />
     <Compile Include="Pdf\PageSizes.cs" />
@@ -120,12 +119,8 @@
   <ItemGroup>
     <Content Include="Installers\gs924w64.exe" />
     <Content Include="Installers\tesseract-ocr-setup-3.05.02-20180621.exe" />
-    <Content Include="jbig2.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Installers\hocrtopdf-26395.zip" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
