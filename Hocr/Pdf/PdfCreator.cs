@@ -232,10 +232,10 @@ namespace Hocr.Pdf
                     i = Image.GetInstance(ImageProcessor.ConvertToImage(image, "BMP", PdfSettings.ImageQuality, PdfSettings.Dpi),
                         ImageFormat.Bmp);
                     break;
-                case PdfImageType.JBig2:
-                    JBig2 jbig = new JBig2();
-                    i = jbig.ProcessImage(image, sessionName);
-                    break;
+                //case PdfImageType.JBig2:
+                //    JBig2 jbig = new JBig2();
+                //    i = jbig.ProcessImage(image, sessionName);
+                //    break;
             }
             return i;
         }
