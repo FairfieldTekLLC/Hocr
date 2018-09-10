@@ -12,10 +12,7 @@ namespace Hocr.ImageProcessors
         }
 
         private readonly string _path;
-
-        public const string Tiff12Nc = "tiff12nc";
-        public const string Tiffg4 = "tiffg4";
-
+        
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
             string outPut = GetOutPutFileName(sessionName, ".bmp");
@@ -57,7 +54,7 @@ namespace Hocr.ImageProcessors
             };
             using (var proc = Process.Start(startexe))
             {
-                proc.WaitForExit();
+                proc?.WaitForExit();
             }
         }
     }

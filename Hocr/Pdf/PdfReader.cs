@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Hocr.ImageProcessors;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
 using iTextSharp.text.pdf.parser;
 using Image = System.Drawing.Image;
 
@@ -47,11 +42,6 @@ namespace Hocr.Pdf
             }
 
             TextReader = null;
-        }
-
-        public void Close()
-        {
-            TextReader.Close();
         }
         
         public string GetPageImage(int pageNumber, bool useGhostscript, string sessionName)

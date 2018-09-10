@@ -54,7 +54,7 @@ namespace Hocr
             };
             using (Process proc = Process.Start(startexe))
             {
-                proc.WaitForExit();
+                proc?.WaitForExit();
             }
         }
     }

@@ -29,7 +29,7 @@ namespace Hocr.ImageProcessors
 
             using (var proc = Process.Start(startexe))
             {
-                proc.WaitForExit();
+                proc?.WaitForExit();
             }
         }
 
