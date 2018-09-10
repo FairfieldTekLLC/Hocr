@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using Hocr.Enums;
 
 namespace Hocr.ImageProcessors
 {
@@ -30,10 +31,33 @@ namespace Hocr.ImageProcessors
             return "\"" + TempData.Instance.CreateTempFile(sessionName, extWithDot) + "\"";
         }
 
-        public string CompressPdf(string inputPdf, string sessionName)
+        public string CompressPdf(string inputPdf, string sessionName,PdfCompatibilityLevel level)
         {
+            string clevel = "1.3";
+            switch (level)
+            {
+                case PdfCompatibilityLevel.Acrobat_4_1_3:
+                    clevel = "1.3";
+                    break;
+                case PdfCompatibilityLevel.Acrobat_5_1_4:
+                    clevel = "1.4";
+                    break;
+                case PdfCompatibilityLevel.Acrobat_6_1_5:
+                    clevel = "1.5";
+                    break;
+                case PdfCompatibilityLevel.Acrobat_7_1_6:
+                    clevel = "1.6";
+                    break;
+                case PdfCompatibilityLevel.Acrobat_7_1_7:
+                    clevel = "1.7";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
+            }
+
+
             string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-            string command =$@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel=1.3 -dPDFSETTINGS=/screen -dEmbedAllFonts=true -dSubsetFonts=true -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dMonoImageDownsampleType=/Bicubic -dMonoImageResolution=144 -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
+            string command =$@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/screen -dEmbedAllFonts=true -dSubsetFonts=true -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dMonoImageDownsampleType=/Bicubic -dMonoImageResolution=144 -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
             RunCommand(command);
             return outPutFileName;
 

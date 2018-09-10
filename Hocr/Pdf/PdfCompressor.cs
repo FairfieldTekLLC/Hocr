@@ -97,7 +97,7 @@ namespace Hocr.Pdf
             if (PdfSettings.CompressFinalPdf)
             {
                 GhostScript gs = new GhostScript(GhostScriptPath);
-                outputFileName = gs.CompressPdf(outputDataFilePath, sessionName);
+                outputFileName = gs.CompressPdf(outputDataFilePath, sessionName,PdfSettings.PdfCompatibilityLevel);
             }
             
             

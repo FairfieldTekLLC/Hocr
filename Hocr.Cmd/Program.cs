@@ -47,7 +47,8 @@ namespace Hocr.Cmd
                 Dpi = 400,
                 ImageQuality = 100,
                 WriteTextMode = WriteTextMode.Word,
-                CompressFinalPdf = true
+                CompressFinalPdf = true,
+                PdfCompatibilityLevel = PdfCompatibilityLevel.Acrobat_7_1_6
             };
 
             _comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, pdfSettings);

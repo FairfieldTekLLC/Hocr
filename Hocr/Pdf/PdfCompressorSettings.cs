@@ -40,5 +40,7 @@ namespace Hocr.Pdf
         public WriteTextMode WriteTextMode { get; set; }
 
         public bool CompressFinalPdf { get; set; } = true;
+
+        public PdfCompatibilityLevel PdfCompatibilityLevel { get; set; } = PdfCompatibilityLevel.Acrobat_7_1_6;
     }
 }

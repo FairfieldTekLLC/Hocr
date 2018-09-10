@@ -87,6 +87,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\PdfCompatibilityLevel.cs" />
     <Compile Include="Enums\PdfImageType.cs" />
     <Compile Include="Enums\PdfMode.cs" />
     <Compile Include="Enums\WriteTextMode.cs" />
