@@ -16,7 +16,7 @@ namespace Hocr.Cmd
 
         static async void Example(byte[] data, string outfile)
         {
-            byte[] odata = await Task.Run(() => _comp.CreateSearchablePdf(data, new PdfMeta()
+            byte[] odata = await Task.Run(() => _comp.CreateSearchablePdfAsync(data, new PdfMeta()
             {
                 Author = "Vince",
                 KeyWords = string.Empty,

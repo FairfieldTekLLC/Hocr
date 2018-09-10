@@ -76,7 +76,39 @@ namespace Hocr.Pdf
         /// </summary>
         public event PreProcessImage OnPreProcessImage;
 
-        public async Task<byte[]> CreateSearchablePdf(byte[] fileData,PdfMeta metaData)
+
+        public byte[] CreateSearchablePdf(byte[] fileData, PdfMeta metaData)
+        {
+            string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
+
+            TempData.Instance.CreateNewSession(sessionName);
+
+            string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+            string outputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+
+            using (FileStream writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
+            {
+                writer.Write(fileData, 0, fileData.Length);
+                writer.Flush(true);
+            }
+            bool check =  CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData);
+
+            string outputFileName = outputDataFilePath;
+
+            if (PdfSettings.CompressFinalPdf)
+            {
+                GhostScript gs = new GhostScript(GhostScriptPath);
+                outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel);
+            }
+
+
+            byte[] outFile = File.ReadAllBytes(outputFileName);
+            TempData.Instance.DestroySession(sessionName);
+            return outFile;
+        }
+
+
+        public async Task<byte[]> CreateSearchablePdfAsync(byte[] fileData,PdfMeta metaData)
         {
             string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
