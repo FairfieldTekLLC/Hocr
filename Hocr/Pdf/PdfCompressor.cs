@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Hocr.Enums;
+using Hocr.ImageProcessors;
 
 namespace Hocr.Pdf
 {
@@ -90,7 +91,17 @@ namespace Hocr.Pdf
                 writer.Flush(true);
             }
             bool check = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath,metaData)));
-            byte[] outFile = File.ReadAllBytes(outputDataFilePath);
+
+            string outputFileName = outputDataFilePath;
+
+            if (PdfSettings.CompressFinalPdf)
+            {
+                GhostScript gs = new GhostScript(GhostScriptPath);
+                outputFileName = gs.CompressPdf(outputDataFilePath, sessionName);
+            }
+            
+            
+            byte[] outFile = File.ReadAllBytes(outputFileName);
             TempData.Instance.DestroySession(sessionName);
             return outFile;
         }

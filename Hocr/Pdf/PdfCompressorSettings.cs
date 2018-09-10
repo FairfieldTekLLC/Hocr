@@ -3,18 +3,18 @@ using iTextSharp.text;
 
 namespace Hocr.Pdf
 {
-   
-    public  class PdfCompressorSettings
+
+    public class PdfCompressorSettings
     {
         public PdfCompressorSettings()
         {
             Dpi = 600;
-    
+
             ImageType = PdfImageType.Png;
-    
+
             ImageQuality = 30;
             WriteTextMode = WriteTextMode.Word;
-    
+
             Language = "eng";
         }
 
@@ -38,5 +38,7 @@ namespace Hocr.Pdf
         ///     write unlerlay text by lin e or word. by line creates smalled pdf files. word is ignored if OcrMode == cuneiform
         /// </summary>
         public WriteTextMode WriteTextMode { get; set; }
+
+        public bool CompressFinalPdf { get; set; } = true;
     }
 }

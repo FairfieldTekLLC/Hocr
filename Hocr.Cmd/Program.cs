@@ -43,10 +43,11 @@ namespace Hocr.Cmd
 
             PdfCompressorSettings PdfSettings = new PdfCompressorSettings
             {
-                ImageType = PdfImageType.JBig2,
+                ImageType = PdfImageType.Jpg,
                 Dpi = 400,
                 ImageQuality = 100,
-                WriteTextMode = WriteTextMode.Word
+                WriteTextMode = WriteTextMode.Word,
+                CompressFinalPdf = true
             };
 
             comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, PdfSettings);
