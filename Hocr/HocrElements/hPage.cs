@@ -30,7 +30,8 @@ namespace Hocr.HocrElements
             {
                 l.CleanText();
 
-                List<HLine> linesOnThisLine = lines.Where(x => Math.Abs(x.BBox.DefaultPointBBox.Top - l.BBox.DefaultPointBBox.Top) <= 2).OrderBy(x => x.BBox.Left)
+                List<HLine> linesOnThisLine = lines.Where(x => Math.Abs(x.BBox.DefaultPointBBox.Top - l.BBox.DefaultPointBBox.Top) <= 2)
+                    .OrderBy(x => x.BBox.Left)
                     .Distinct().ToList();
 
                 if (linesOnThisLine.Select(x => x.Id.Trim()).Distinct().Count() > 1)

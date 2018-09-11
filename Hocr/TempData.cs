@@ -8,8 +8,10 @@ namespace Hocr
 {
     public class TempData : IDisposable
     {
-        private static readonly Lazy<TempData> LazyInstance = new Lazy<TempData>(CreateInstanceOfT, LazyThreadSafetyMode.ExecutionAndPublication);
         private readonly Dictionary<string, string> _caches = new Dictionary<string, string>();
+
+        private string TemporaryFilePath { get; } = // @"C:\HocrCache\";
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
 
         private TempData()
         {
@@ -25,11 +27,9 @@ namespace Hocr
             }
         }
 
-        private string TemporaryFilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
+        private static readonly Lazy<TempData> LazyInstance = new Lazy<TempData>(CreateInstanceOfT, LazyThreadSafetyMode.ExecutionAndPublication);
 
         public static TempData Instance => LazyInstance.Value;
-
-        public void Dispose() { }
 
         private static TempData CreateInstanceOfT() { return Activator.CreateInstance(typeof(TempData), true) as TempData; }
 
@@ -69,10 +69,12 @@ namespace Hocr
             return newFolderName;
         }
 
-        public string CreateTempFile(string sessionName, string extensionWithDot)
+        public string CreateTempFile(string sessionName, string extensionWithDot, string folders = null)
         {
             if (!_caches.ContainsKey(sessionName))
                 throw new Exception("Invalid Session");
+
+
             string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + extensionWithDot);
             return newFile;
         }
@@ -82,8 +84,20 @@ namespace Hocr
             if (!_caches.ContainsKey(sessionName))
                 return;
 
-            if (Directory.Exists(_caches[sessionName]))
-                Directory.Delete(_caches[sessionName], true);
+            bool keepTrying = true;
+            while (keepTrying)
+            {
+                try
+                {
+                    if (Directory.Exists(_caches[sessionName]))
+                        Directory.Delete(_caches[sessionName], true);
+                    keepTrying = false;
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(500);
+                }
+            }
 
             _caches.Remove(sessionName);
         }
@@ -100,5 +114,7 @@ namespace Hocr
 
             return Path.Combine(_caches[sessionName], directoryName);
         }
+
+        public void Dispose() { }
     }
 }

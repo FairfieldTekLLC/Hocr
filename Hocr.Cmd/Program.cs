@@ -29,7 +29,6 @@ namespace Hocr.Cmd
             _fileCounter = _fileCounter - 1;
             if (_fileCounter == 0)
                 Environment.Exit(0);
-
         }
 
         static PdfCompressor _comp;
@@ -76,9 +75,9 @@ namespace Hocr.Cmd
                 Console.WriteLine("Working...." + counter);
                 counter++;
             }
+
             Console.WriteLine("Finished!");
             Console.ReadLine();
-
         }
 
 
@@ -89,7 +88,5 @@ namespace Hocr.Cmd
             Console.WriteLine(x.StackTrace);
             _running = false;
         }
-
-
     }
 }
