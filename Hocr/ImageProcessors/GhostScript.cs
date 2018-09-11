@@ -71,9 +71,9 @@ namespace Hocr.ImageProcessors
                 WorkingDirectory = Directory.GetCurrentDirectory(),
                 WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
+                RedirectStandardError = false,
+                RedirectStandardInput =false,
+                RedirectStandardOutput = false,
                 UseShellExecute = false,
             };
             using (var proc = Process.Start(startexe))

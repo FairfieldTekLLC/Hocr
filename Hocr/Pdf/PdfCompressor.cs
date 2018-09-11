@@ -1,10 +1,9 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using Hocr.Enums;
 using Hocr.ImageProcessors;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Hocr.Pdf
 {
@@ -27,15 +26,15 @@ namespace Hocr.Pdf
             GhostScriptPath = ghostScriptPath;
             PdfSettings = settings ?? new PdfCompressorSettings();
         }
-        
-      
-        public PdfCompressorSettings PdfSettings {get; }
-        
-        private bool CompressAndOcr(string sessionName, string inputFileName, string outputFileName,PdfMeta meta)
+
+
+        public PdfCompressorSettings PdfSettings { get; }
+
+        private bool CompressAndOcr(string sessionName, string inputFileName, string outputFileName, PdfMeta meta)
         {
 
             PdfReader reader = new PdfReader(inputFileName, GhostScriptPath);
-            PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath,meta)
+            PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath, meta)
             {
                 PdfSettings =
                 {
@@ -79,63 +78,83 @@ namespace Hocr.Pdf
 
         public byte[] CreateSearchablePdf(byte[] fileData, PdfMeta metaData)
         {
-            string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
-
-            TempData.Instance.CreateNewSession(sessionName);
-
-            string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-            string outputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-
-            using (FileStream writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
+            try
             {
-                writer.Write(fileData, 0, fileData.Length);
-                writer.Flush(true);
+
+
+                string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
+
+                TempData.Instance.CreateNewSession(sessionName);
+
+                string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+                string outputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+
+                using (FileStream writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    writer.Write(fileData, 0, fileData.Length);
+                    writer.Flush(true);
+                }
+
+                bool check = CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData);
+
+                string outputFileName = outputDataFilePath;
+
+                if (PdfSettings.CompressFinalPdf)
+                {
+                    GhostScript gs = new GhostScript(GhostScriptPath);
+                    outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel);
+                }
+
+
+                byte[] outFile = File.ReadAllBytes(outputFileName);
+                TempData.Instance.DestroySession(sessionName);
+                return outFile;
             }
-            bool check =  CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData);
-
-            string outputFileName = outputDataFilePath;
-
-            if (PdfSettings.CompressFinalPdf)
+            catch (Exception e)
             {
-                GhostScript gs = new GhostScript(GhostScriptPath);
-                outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel);
+                Console.WriteLine(e);
+                throw;
             }
-
-
-            byte[] outFile = File.ReadAllBytes(outputFileName);
-            TempData.Instance.DestroySession(sessionName);
-            return outFile;
         }
 
-
-        public async Task<byte[]> CreateSearchablePdfAsync(byte[] fileData,PdfMeta metaData)
+        public async Task<byte[]> CreateSearchablePdfAsync(byte[] fileData, PdfMeta metaData)
         {
-            string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
-
-            TempData.Instance.CreateNewSession(sessionName);
-
-            string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-            string outputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-
-            using (FileStream writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
+            try
             {
-                writer.Write(fileData, 0, fileData.Length);
-                writer.Flush(true);
+
+
+                string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
+
+                TempData.Instance.CreateNewSession(sessionName);
+
+                string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+                string outputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+
+                using (FileStream writer = new FileStream(inputDataFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    writer.Write(fileData, 0, fileData.Length);
+                    writer.Flush(true);
+                }
+                bool check = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData)));
+
+                string outputFileName = outputDataFilePath;
+
+                if (PdfSettings.CompressFinalPdf)
+                {
+                    GhostScript gs = new GhostScript(GhostScriptPath);
+                    outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel);
+                }
+
+
+                byte[] outFile = File.ReadAllBytes(outputFileName);
+                TempData.Instance.DestroySession(sessionName);
+                return outFile;
             }
-            bool check = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath,metaData)));
-
-            string outputFileName = outputDataFilePath;
-
-            if (PdfSettings.CompressFinalPdf)
+            catch (Exception e)
             {
-                GhostScript gs = new GhostScript(GhostScriptPath);
-                outputFileName = gs.CompressPdf(outputDataFilePath, sessionName,PdfSettings.PdfCompatibilityLevel);
+                Console.WriteLine(e);
+                throw;
             }
-            
-            
-            byte[] outFile = File.ReadAllBytes(outputFileName);
-            TempData.Instance.DestroySession(sessionName);
-            return outFile;
         }
 
     }

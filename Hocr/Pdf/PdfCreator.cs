@@ -250,8 +250,6 @@ namespace Hocr.Pdf
                 if (_doc.PageNumber == 0)
                     _doc.NewPage();
 
-                _writer.CompressionLevel = 100;
-                _writer.SetFullCompression();
 
                 _doc.Close();
             }
@@ -270,6 +268,8 @@ namespace Hocr.Pdf
             try
             {
                 _writer = PdfWriter.GetInstance(_doc, new FileStream(fileName, FileMode.Create));
+                _writer.CompressionLevel = 100;
+                _writer.SetFullCompression();
             }
             catch (Exception)
             {
