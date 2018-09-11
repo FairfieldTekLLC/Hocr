@@ -71,16 +71,18 @@ namespace Hocr.HocrElements
                     }
 
                     bbox = string.Empty;
-                    if ((int)c.BBox.Left != -1)
+                    if ((int) c.BBox.Left != -1)
                     {
                         c.ListOrder = charPos;
                         w.Characters.Add(c);
                     }
+
                     charPos += 1;
                 }
 
                 bbox += coords[i] + " ";
             }
+
             if (w.Characters.Count <= 0 || word.Trim() == string.Empty)
                 return;
             w.Text = word;
@@ -161,6 +163,7 @@ namespace Hocr.HocrElements
                                 _currentPara = new HParagraph();
                                 _currentPage.Paragraphs.Add(_currentPara);
                             }
+
                             _currentPara.Lines.Add(_currentLine);
                             break;
 
@@ -185,6 +188,7 @@ namespace Hocr.HocrElements
                             break;
                     }
                 }
+
                 ParseNodes(node.ChildNodes);
             }
         }
@@ -215,11 +219,10 @@ namespace Hocr.HocrElements
                         }
                     }
                 }
+
                 if (s.Contains("ppageno"))
-                {
                     if (int.TryParse(s.Replace("ppageno", ""), out int frame))
                         _currentPage.ImageFrameNumber = frame;
-                }
                 if (!s.Contains("bbox"))
                     continue;
                 string coords = s.Replace("bbox", "");

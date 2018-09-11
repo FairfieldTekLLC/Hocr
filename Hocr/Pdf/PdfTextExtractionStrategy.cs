@@ -7,15 +7,10 @@ namespace Hocr.Pdf
 {
     internal class PdfTextExtractionStrategy : LocationTextExtractionStrategy
     {
-        public PdfTextExtractionStrategy()
-        {
-            Elements = new List<HOcrClass>();
-        }
+        public PdfTextExtractionStrategy() { Elements = new List<HOcrClass>(); }
 
-        public IList<HOcrClass> Elements {
-            get;
-        }
-        
+        public IList<HOcrClass> Elements { get; }
+
         public override void RenderText(TextRenderInfo info)
         {
             Vector bottomLeft = info.GetDescentLine().GetStartPoint();

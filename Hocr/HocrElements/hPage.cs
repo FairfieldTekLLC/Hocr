@@ -6,10 +6,7 @@ namespace Hocr.HocrElements
 {
     internal class HPage : HOcrClass
     {
-        public HPage()
-        {
-            Paragraphs = new List<HParagraph>();
-        }
+        public HPage() { Paragraphs = new List<HParagraph>(); }
 
         public int AverageWordCountPerLine { get; private set; }
 

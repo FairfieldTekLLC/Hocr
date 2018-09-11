@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Drawing;
 using Hocr.ImageProcessors;
 using iTextSharp.text.pdf.parser;
-using Image = System.Drawing.Image;
 
 namespace Hocr.Pdf
 {
@@ -18,15 +18,11 @@ namespace Hocr.Pdf
             TextReader = new iTextSharp.text.pdf.PdfReader(sourcePdf);
         }
 
-        public iTextSharp.text.pdf.PdfReader TextReader {
-            get; private set;
-        }
+        public iTextSharp.text.pdf.PdfReader TextReader { get; private set; }
 
         public int PageCount => TextReader.NumberOfPages;
 
-        public string SourcePdf {
-            get;
-        }
+        public string SourcePdf { get; }
 
 
         public void Dispose()
@@ -38,19 +34,18 @@ namespace Hocr.Pdf
             catch (Exception e)
             {
                 Console.WriteLine(e);
-
             }
 
             TextReader = null;
         }
-        
+
         public string GetPageImage(int pageNumber, bool useGhostscript, string sessionName)
         {
             if (useGhostscript)
                 return GetPageImageWithGhostScript(pageNumber, sessionName);
 
             PdfReaderContentParser parser = new PdfReaderContentParser(TextReader);
-            MyImageRenderListener listener = new MyImageRenderListener { PageNumber = pageNumber, Reader = this };
+            MyImageRenderListener listener = new MyImageRenderListener {PageNumber = pageNumber, Reader = this};
 
             try
             {
@@ -72,6 +67,7 @@ namespace Hocr.Pdf
                 Console.WriteLine("Getting page via GhostScript");
                 return GetPageImageWithGhostScript(pageNumber, sessionName);
             }
+
             return null;
         }
 
@@ -89,12 +85,5 @@ namespace Hocr.Pdf
 
             return te;
         }
-        
     }
-
-
-
-
-
-
 }

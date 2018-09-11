@@ -16,14 +16,15 @@ namespace Hocr.Cmd
 
         static async void Example(byte[] data, string outfile)
         {
-            byte[] odata = await Task.Run(() => _comp.CreateSearchablePdfAsync(data, new PdfMeta()
+            Tuple<byte[], string> odata = await Task.Run(() => _comp.CreateSearchablePdfAsync(data, new PdfMeta()
             {
                 Author = "Vince",
                 KeyWords = string.Empty,
                 Subject = string.Empty,
                 Title = string.Empty,
             }));
-            File.WriteAllBytes(outfile, odata);
+            File.WriteAllBytes(outfile, odata.Item1);
+            Console.WriteLine("OCR BODY: " + odata.Item2);
             Console.WriteLine("Finished " + outfile);
             _fileCounter = _fileCounter - 1;
             if (_fileCounter == 0)

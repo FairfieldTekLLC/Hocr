@@ -5,10 +5,7 @@ namespace Hocr.HocrElements
 {
     internal class BBox
     {
-        public BBox()
-        {
-            Format = UnitFormat.Pixel;
-        }
+        public BBox() { Format = UnitFormat.Pixel; }
 
         public BBox(string boxvalues)
         {

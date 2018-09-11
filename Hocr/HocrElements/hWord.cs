@@ -5,10 +5,7 @@ namespace Hocr.HocrElements
 {
     internal class HWord : HOcrClass
     {
-        public HWord()
-        {
-            Characters = new List<HChar>();
-        }
+        public HWord() { Characters = new List<HChar>(); }
 
         public IList<HChar> Characters { get; set; }
 

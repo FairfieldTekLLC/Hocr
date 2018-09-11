@@ -7,13 +7,10 @@ namespace Hocr.ImageProcessors
 {
     internal class GhostScript
     {
-        public GhostScript(string path)
-        {
-            _path = path;
-        }
-
         private readonly string _path;
-        
+
+        public GhostScript(string path) { _path = path; }
+
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
             string outPut = GetOutPutFileName(sessionName, ".bmp");
@@ -31,7 +28,7 @@ namespace Hocr.ImageProcessors
             return "\"" + TempData.Instance.CreateTempFile(sessionName, extWithDot) + "\"";
         }
 
-        public string CompressPdf(string inputPdf, string sessionName,PdfCompatibilityLevel level)
+        public string CompressPdf(string inputPdf, string sessionName, PdfCompatibilityLevel level)
         {
             string clevel = "1.3";
             switch (level)
@@ -57,26 +54,25 @@ namespace Hocr.ImageProcessors
 
 
             string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-            string command =$@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/screen -dEmbedAllFonts=true -dSubsetFonts=true -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dMonoImageDownsampleType=/Bicubic -dMonoImageResolution=144 -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
+            string command =
+                $@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/screen -dEmbedAllFonts=true -dSubsetFonts=true -dColorImageDownsampleType=/Bicubic -dColorImageResolution=144 -dGrayImageDownsampleType=/Bicubic -dGrayImageResolution=144 -dMonoImageDownsampleType=/Bicubic -dMonoImageResolution=144 -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
             RunCommand(command);
             return outPutFileName;
-
         }
 
         private void RunCommand(string command)
         {
-
-            var startexe = new ProcessStartInfo(_path, command)
+            ProcessStartInfo startexe = new ProcessStartInfo(_path, command)
             {
                 WorkingDirectory = Directory.GetCurrentDirectory(),
                 WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
-                RedirectStandardError = false,
-                RedirectStandardInput =false,
-                RedirectStandardOutput = false,
-                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardInput = false,
+                RedirectStandardOutput = true,
+                UseShellExecute = false
             };
-            using (var proc = Process.Start(startexe))
+            using (Process proc = Process.Start(startexe))
             {
                 proc?.WaitForExit();
             }

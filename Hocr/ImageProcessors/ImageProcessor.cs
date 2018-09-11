@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Hocr.HocrElements;
-
 
 namespace Hocr.ImageProcessors
 {
@@ -74,7 +71,7 @@ namespace Hocr.ImageProcessors
                     //                           B                             G                              R
                     int pixelTotal = sourceBuffer[sourceIndex] + sourceBuffer[sourceIndex + 1] + sourceBuffer[sourceIndex + 2];
                     if (pixelTotal > threshold)
-                        destinationValue += (byte)pixelValue;
+                        destinationValue += (byte) pixelValue;
                     if (pixelValue == 1)
                     {
                         destinationBuffer[destinationIndex] = destinationValue;
@@ -86,8 +83,10 @@ namespace Hocr.ImageProcessors
                     {
                         pixelValue >>= 1;
                     }
+
                     sourceIndex += 4;
                 }
+
                 if (pixelValue != 128)
                     destinationBuffer[destinationIndex] = destinationValue;
             }
@@ -114,8 +113,11 @@ namespace Hocr.ImageProcessors
             ImageCodecInfo codecInfo = GetCodecInfoForName("TIFF");
             EncoderParameters encoderParams = new EncoderParameters(2)
             {
-                Param = {[0] = new EncoderParameter(Encoder.Quality, 08L),
-                [1] = new EncoderParameter(Encoder.SaveFlag, (long) EncoderValue.CompressionCCITT4)}
+                Param =
+                {
+                    [0] = new EncoderParameter(Encoder.Quality, 08L),
+                    [1] = new EncoderParameter(Encoder.SaveFlag, (long) EncoderValue.CompressionCCITT4)
+                }
             };
 
             MemoryStream ms = new MemoryStream();
@@ -131,7 +133,7 @@ namespace Hocr.ImageProcessors
             ImageCodecInfo codecInfo = GetCodecInfoForName(codecName);
             EncoderParameters encoderParams = new EncoderParameters(1)
             {
-                Param = { [0] = new EncoderParameter(Encoder.Quality, quality) }
+                Param = {[0] = new EncoderParameter(Encoder.Quality, quality)}
             };
             Bitmap newBitmap = new Bitmap(bmp);
             newBitmap.SetResolution(dpi, dpi);
@@ -165,13 +167,9 @@ namespace Hocr.ImageProcessors
         {
             ImageCodecInfo[] info = ImageCodecInfo.GetImageEncoders();
             return (from t in info
-                    let enumName = codecType
-                    where t.FormatDescription.Equals(enumName)
-                    select t).FirstOrDefault();
+                let enumName = codecType
+                where t.FormatDescription.Equals(enumName)
+                select t).FirstOrDefault();
         }
-
-
-
-
     }
 }

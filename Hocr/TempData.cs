@@ -8,9 +8,8 @@ namespace Hocr
 {
     public class TempData : IDisposable
     {
+        private static readonly Lazy<TempData> LazyInstance = new Lazy<TempData>(CreateInstanceOfT, LazyThreadSafetyMode.ExecutionAndPublication);
         private readonly Dictionary<string, string> _caches = new Dictionary<string, string>();
-
-        private string TemporaryFilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
 
         private TempData()
         {
@@ -26,14 +25,13 @@ namespace Hocr
             }
         }
 
-        private static readonly Lazy<TempData> LazyInstance = new Lazy<TempData>(CreateInstanceOfT, LazyThreadSafetyMode.ExecutionAndPublication);
+        private string TemporaryFilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
 
         public static TempData Instance => LazyInstance.Value;
 
-        private static TempData CreateInstanceOfT()
-        {
-            return Activator.CreateInstance(typeof(TempData), true) as TempData;
-        }
+        public void Dispose() { }
+
+        private static TempData CreateInstanceOfT() { return Activator.CreateInstance(typeof(TempData), true) as TempData; }
 
         public string CreateNewSession(string sessionName)
         {
@@ -88,7 +86,6 @@ namespace Hocr
                 Directory.Delete(_caches[sessionName], true);
 
             _caches.Remove(sessionName);
-
         }
 
         public string CreateDirectory(string sessionName, string directoryName)
@@ -102,12 +99,6 @@ namespace Hocr
             Directory.CreateDirectory(Path.Combine(_caches[sessionName], directoryName));
 
             return Path.Combine(_caches[sessionName], directoryName);
-
-
-        }
-
-        public void Dispose()
-        {
         }
     }
 }

@@ -1,9 +1,8 @@
-﻿
-using Hocr.Enums;
-using Hocr.ImageProcessors;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Hocr.Enums;
+using Hocr.ImageProcessors;
 
 namespace Hocr.Pdf
 {
@@ -13,13 +12,6 @@ namespace Hocr.Pdf
 
     public class PdfCompressor
     {
-        private string GhostScriptPath {
-            get;
-        }
-        private string TesseractPath {
-            get;
-        }
-
         public PdfCompressor(string ghostScriptPath, string tesseractPath, PdfCompressorSettings settings = null)
         {
             TesseractPath = tesseractPath;
@@ -27,12 +19,16 @@ namespace Hocr.Pdf
             PdfSettings = settings ?? new PdfCompressorSettings();
         }
 
+        private string GhostScriptPath { get; }
+
+        private string TesseractPath { get; }
+
 
         public PdfCompressorSettings PdfSettings { get; }
 
-        private bool CompressAndOcr(string sessionName, string inputFileName, string outputFileName, PdfMeta meta)
+        private string CompressAndOcr(string sessionName, string inputFileName, string outputFileName, PdfMeta meta)
         {
-
+            string pAgeBody = "";
             PdfReader reader = new PdfReader(inputFileName, GhostScriptPath);
             PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath, meta)
             {
@@ -49,23 +45,33 @@ namespace Hocr.Pdf
                     string img = reader.GetPageImage(i, true, sessionName);
                     if (OnPreProcessImage != null)
                         img = OnPreProcessImage(img);
-                    writer.AddPage(img, PdfMode.Ocr, sessionName);
+                    pAgeBody = pAgeBody + writer.AddPage(img, PdfMode.Ocr, sessionName);
                 }
+
                 writer.SaveAndClose();
                 writer.Dispose();
                 reader.Dispose();
-                return true;
+                return pAgeBody;
             }
             catch (Exception x)
             {
-                Console.WriteLine(x.Message);
-                Console.WriteLine("Image not supported in " + Path.GetFileName(inputFileName) + ". Skipping");
-                writer.SaveAndClose();
-                writer.Dispose();
-                reader.Dispose();
+                try
+                {
+                    Console.WriteLine(x.Message);
+                    Console.WriteLine("Image not supported in " + Path.GetFileName(inputFileName) + ". Skipping");
+                    writer.SaveAndClose();
+                    writer.Dispose();
+                    reader.Dispose();
+                }
+                catch (Exception)
+                {
+                    //
+                }
+
                 OnExceptionOccurred?.Invoke(this, x);
             }
-            return false;
+
+            return "";
         }
 
         public event CompressorExceptionOccurred OnExceptionOccurred;
@@ -76,12 +82,10 @@ namespace Hocr.Pdf
         public event PreProcessImage OnPreProcessImage;
 
 
-        public byte[] CreateSearchablePdf(byte[] fileData, PdfMeta metaData)
+        public Tuple<byte[], string> CreateSearchablePdf(byte[] fileData, PdfMeta metaData)
         {
             try
             {
-
-
                 string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
                 TempData.Instance.CreateNewSession(sessionName);
@@ -95,7 +99,7 @@ namespace Hocr.Pdf
                     writer.Flush(true);
                 }
 
-                bool check = CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData);
+                string pageBody = CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData);
 
                 string outputFileName = outputDataFilePath;
 
@@ -108,7 +112,7 @@ namespace Hocr.Pdf
 
                 byte[] outFile = File.ReadAllBytes(outputFileName);
                 TempData.Instance.DestroySession(sessionName);
-                return outFile;
+                return new Tuple<byte[], string>(outFile, pageBody);
             }
             catch (Exception e)
             {
@@ -117,12 +121,10 @@ namespace Hocr.Pdf
             }
         }
 
-        public async Task<byte[]> CreateSearchablePdfAsync(byte[] fileData, PdfMeta metaData)
+        public async Task<Tuple<byte[], string>> CreateSearchablePdfAsync(byte[] fileData, PdfMeta metaData)
         {
             try
             {
-
-
                 string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
                 TempData.Instance.CreateNewSession(sessionName);
@@ -135,7 +137,8 @@ namespace Hocr.Pdf
                     writer.Write(fileData, 0, fileData.Length);
                     writer.Flush(true);
                 }
-                bool check = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData)));
+
+                string pageBody = await Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData));
 
                 string outputFileName = outputDataFilePath;
 
@@ -145,10 +148,9 @@ namespace Hocr.Pdf
                     outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel);
                 }
 
-
                 byte[] outFile = File.ReadAllBytes(outputFileName);
                 TempData.Instance.DestroySession(sessionName);
-                return outFile;
+                return new Tuple<byte[], string>(outFile, pageBody);
             }
             catch (Exception e)
             {
@@ -156,6 +158,5 @@ namespace Hocr.Pdf
                 throw;
             }
         }
-
     }
 }

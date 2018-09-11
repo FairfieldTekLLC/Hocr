@@ -8,21 +8,14 @@ namespace Hocr.Pdf
     internal class MyImageRenderListener : IRenderListener
     {
         public List<ParsedPageImage> ParsedImages = new List<ParsedPageImage>();
-        public int PageNumber {
-            get; set;
-        }
 
-        public PdfReader Reader {
-            get; set;
-        }
+        public int PageNumber { get; set; }
 
-        public void BeginTextBlock()
-        {
-        }
+        public PdfReader Reader { get; set; }
 
-        public void EndTextBlock()
-        {
-        }
+        public void BeginTextBlock() { }
+
+        public void EndTextBlock() { }
 
         public void RenderImage(ImageRenderInfo renderInfo)
         {
@@ -49,12 +42,10 @@ namespace Hocr.Pdf
             }
             catch (IOException)
             {
-             //
+                //
             }
         }
 
-        public void RenderText(TextRenderInfo renderInfo)
-        {
-        }
+        public void RenderText(TextRenderInfo renderInfo) { }
     }
 }

@@ -19,9 +19,6 @@ namespace Hocr.HocrElements
             Text = results;
         }
 
-        public override string ToString()
-        {
-            return string.Concat("Id: ", Id, "[", BBox.ToString(), "] Text: ", Text);
-        }
+        public override string ToString() { return string.Concat("Id: ", Id, "[", BBox.ToString(), "] Text: ", Text); }
     }
 }

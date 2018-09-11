@@ -6,17 +6,12 @@ namespace Hocr.Pdf
 {
     internal class ParsedPageImage
     {
-        public Image Image {
-            get; set;
-        }
-        public int IndirectReferenceNum {
-            get; set;
-        }
-        public PdfImageObject PdfImageObject {
-            get; set;
-        }
-        public PRStream PrStream {
-            get; set;
-        }
+        public Image Image { get; set; }
+
+        public int IndirectReferenceNum { get; set; }
+
+        public PdfImageObject PdfImageObject { get; set; }
+
+        public PRStream PrStream { get; set; }
     }
 }

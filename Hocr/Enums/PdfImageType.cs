@@ -1,31 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Hocr.Enums
+﻿namespace Hocr.Enums
 {
     public enum PdfImageType
     {
         /// <summary>
-        /// Convert images to BMP
+        ///     Convert images to BMP
         /// </summary>
         Bmp,
+
         /// <summary>
-        /// Convert images to JPG
+        ///     Convert images to JPG
         /// </summary>
         Jpg,
+
         /// <summary>
-        /// Convert images to Tif
+        ///     Convert images to Tif
         /// </summary>
         Tif,
+
         /// <summary>
-        /// Convert images to Png
+        ///     Convert images to Png
         /// </summary>
         Png,
+
         /// <summary>
-        /// Convert images to GIF
+        ///     Convert images to GIF
         /// </summary>
         Gif
     }

@@ -3,7 +3,6 @@ using iTextSharp.text;
 
 namespace Hocr.Pdf
 {
-
     public class PdfCompressorSettings
     {
         public PdfCompressorSettings()
@@ -27,9 +26,12 @@ namespace Hocr.Pdf
         public string FontName { get; set; }
 
         public long ImageQuality { get; set; }
+
         public PdfImageType ImageType { get; set; }
+
         //public string Keywords { get; set; }
         public string Language { get; set; }
+
         public Rectangle PdfPageSize { get; set; }
         //public string Subject { get; set; }
         //public string Title { get; set; }

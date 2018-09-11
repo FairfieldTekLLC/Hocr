@@ -183,6 +183,7 @@ namespace Hocr.Pdf
                 {
                     throw new ArgumentException(MessageLocalization.GetComposedMessage("can.t.find.page.size.1", name));
                 }
+
             try
             {
                 string width = name.Substring(0, pos);
