@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
@@ -115,6 +116,12 @@ namespace Hocr
             return Path.Combine(_caches[sessionName], directoryName);
         }
 
-        public void Dispose() { }
+        public void Dispose()
+        {
+            foreach (string key in _caches.Keys.ToList())
+            {
+                DestroySession(key);
+            }
+        }
     }
 }
