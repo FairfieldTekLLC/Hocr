@@ -156,7 +156,7 @@ namespace Hocr.Pdf
                             _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
                             WriteUnderlayContent(page);
-                            pageBody = pageBody + page.Text;
+                            pageBody = pageBody + page.TextUnescaped;
                         }
                         catch (Exception err)
                         {
@@ -174,7 +174,7 @@ namespace Hocr.Pdf
                             _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
                             WriteDirectContent(page);
-                            pageBody = pageBody + page.Text;
+                            pageBody = pageBody + page.TextUnescaped;
                         }
                         catch (Exception)
                         {
@@ -188,7 +188,7 @@ namespace Hocr.Pdf
                             _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
                             WritePageDrawBlocks(image, page, sessionName);
-                            pageBody = pageBody + page.Text;
+                            pageBody = pageBody + page.TextUnescaped;
                         }
                         catch (Exception)
                         {
@@ -203,7 +203,7 @@ namespace Hocr.Pdf
                             HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
                             WritePageDrawBlocks(image, page, sessionName);
                             WriteDirectContent(page);
-                            pageBody = pageBody + page.Text;
+                            pageBody = pageBody + page.TextUnescaped;
                         }
                         catch (Exception)
                         {
