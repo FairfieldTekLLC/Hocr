@@ -9,10 +9,8 @@ namespace Hocr
 {
     public class TempData : IDisposable
     {
+        private static readonly Lazy<TempData> LazyInstance = new Lazy<TempData>(CreateInstanceOfT, LazyThreadSafetyMode.ExecutionAndPublication);
         private readonly Dictionary<string, string> _caches = new Dictionary<string, string>();
-
-        private string TemporaryFilePath { get; } = // @"C:\HocrCache\";
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
 
         private TempData()
         {
@@ -28,9 +26,15 @@ namespace Hocr
             }
         }
 
-        private static readonly Lazy<TempData> LazyInstance = new Lazy<TempData>(CreateInstanceOfT, LazyThreadSafetyMode.ExecutionAndPublication);
+        private string TemporaryFilePath { get; } = // @"C:\HocrCache\";
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
 
         public static TempData Instance => LazyInstance.Value;
+
+        public void Dispose()
+        {
+            foreach (string key in _caches.Keys.ToList()) DestroySession(key);
+        }
 
         private static TempData CreateInstanceOfT() { return Activator.CreateInstance(typeof(TempData), true) as TempData; }
 
@@ -87,7 +91,6 @@ namespace Hocr
 
             bool keepTrying = true;
             while (keepTrying)
-            {
                 try
                 {
                     if (Directory.Exists(_caches[sessionName]))
@@ -98,7 +101,6 @@ namespace Hocr
                 {
                     Thread.Sleep(500);
                 }
-            }
 
             _caches.Remove(sessionName);
         }
@@ -114,14 +116,6 @@ namespace Hocr
             Directory.CreateDirectory(Path.Combine(_caches[sessionName], directoryName));
 
             return Path.Combine(_caches[sessionName], directoryName);
-        }
-
-        public void Dispose()
-        {
-            foreach (string key in _caches.Keys.ToList())
-            {
-                DestroySession(key);
-            }
         }
     }
 }

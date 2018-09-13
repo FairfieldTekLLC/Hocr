@@ -3,7 +3,6 @@ using iTextSharp.text;
 
 namespace Hocr.Pdf
 {
-
     public class PdfCompressorSettings
     {
         public PdfCompressorSettings()

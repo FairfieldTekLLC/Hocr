@@ -1,9 +1,8 @@
-﻿
-using Hocr.Enums;
-using Hocr.ImageProcessors;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Hocr.Enums;
+using Hocr.ImageProcessors;
 
 namespace Hocr.Pdf
 {
@@ -13,21 +12,16 @@ namespace Hocr.Pdf
 
     public class PdfCompressor
     {
-        private string GhostScriptPath
-        {
-            get;
-        }
-        private string TesseractPath
-        {
-            get;
-        }
-
         public PdfCompressor(string ghostScriptPath, string tesseractPath, PdfCompressorSettings settings = null)
         {
             TesseractPath = tesseractPath;
             GhostScriptPath = ghostScriptPath;
             PdfSettings = settings ?? new PdfCompressorSettings();
         }
+
+        private string GhostScriptPath { get; }
+
+        private string TesseractPath { get; }
 
 
         public PdfCompressorSettings PdfSettings { get; }
@@ -53,6 +47,7 @@ namespace Hocr.Pdf
                         img = OnPreProcessImage(img);
                     pageBody = pageBody + writer.AddPage(img, PdfMode.Ocr, sessionName);
                 }
+
                 writer.SaveAndClose();
                 writer.Dispose();
                 reader.Dispose();
@@ -68,12 +63,13 @@ namespace Hocr.Pdf
                     writer.Dispose();
                     reader.Dispose();
                 }
-                catch(Exception)
+                catch (Exception)
                 {
-
                 }
+
                 OnExceptionOccurred?.Invoke(this, x);
             }
+
             return "";
         }
 
@@ -135,8 +131,6 @@ namespace Hocr.Pdf
         {
             try
             {
-
-
                 string sessionName = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
 
                 TempData.Instance.CreateNewSession(sessionName);
@@ -149,7 +143,8 @@ namespace Hocr.Pdf
                     writer.Write(fileData, 0, fileData.Length);
                     writer.Flush(true);
                 }
-                string pageBody = await (Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData)));
+
+                string pageBody = await Task.Run(() => CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData));
 
                 string outputFileName = outputDataFilePath;
 
@@ -169,6 +164,5 @@ namespace Hocr.Pdf
                 throw;
             }
         }
-
     }
 }

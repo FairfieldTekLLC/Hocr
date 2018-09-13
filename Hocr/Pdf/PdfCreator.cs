@@ -12,6 +12,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Image = iTextSharp.text.Image;
 using Rectangle = iTextSharp.text.Rectangle;
+
 namespace Hocr.Pdf
 {
     public delegate Image ProcessImageForDisplay(System.Drawing.Image image);
@@ -160,8 +161,6 @@ namespace Hocr.Pdf
                                 WriteUnderlayContent(page);
                                 pageBody = pageBody + page.TextUnescaped;
                             }
-
-                            
                         }
                         catch (Exception err)
                         {
@@ -419,8 +418,8 @@ namespace Hocr.Pdf
 
         private void WriteUnderlayContent(HPage page)
         {
-            foreach (HParagraph para in page.Paragraphs)
-            foreach (HLine line in para.Lines)
+            foreach (HParagraph para in page.Paragraphs.ToList())
+            foreach (HLine line in para.Lines.ToList())
             {
                 if (PdfSettings.WriteTextMode == WriteTextMode.Word)
                 {

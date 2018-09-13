@@ -8,14 +8,14 @@ namespace Hocr.HocrElements
 {
     internal class Parser
     {
-        private static HLine _currentLine;
-        private static HPage _currentPage;
-        private static HParagraph _currentPara;
-        private static HtmlDocument _doc;
-        private static HDocument _hDoc;
-        private static string _hOcrFilePath;
+        private HLine _currentLine;
+        private HPage _currentPage;
+        private HParagraph _currentPara;
+        private HtmlDocument _doc;
+        private HDocument _hDoc;
+        private string _hOcrFilePath;
 
-        private static void ParseCharactersForLine(string title)
+        private void ParseCharactersForLine(string title)
         {
             if (title == null)
                 return;
@@ -90,7 +90,7 @@ namespace Hocr.HocrElements
             _currentLine.Words.Add(w);
         }
 
-        public static HDocument ParseHocr(HDocument hOrcDoc, string hOcrFile, bool append)
+        public  HDocument ParseHocr(HDocument hOrcDoc, string hOcrFile, bool append)
         {
             _hDoc = hOrcDoc;
 
@@ -107,6 +107,7 @@ namespace Hocr.HocrElements
 
             _doc.Load(hOcrFile, Encoding.UTF8);
 
+
             HtmlNode body = _doc.DocumentNode.SelectNodes("//body")[0];
             _hDoc.ClassName = "body";
             HtmlNodeCollection nodes = body.SelectNodes("//div");
@@ -114,9 +115,9 @@ namespace Hocr.HocrElements
             return _hDoc;
         }
 
-        private static void ParseNodes(HtmlNodeCollection nodes)
+        private void ParseNodes(HtmlNodeCollection nodes)
         {
-            foreach (HtmlNode node in nodes)
+            foreach (HtmlNode node in nodes.ToList())
             {
                 if (node.HasAttributes)
                 {
@@ -193,7 +194,7 @@ namespace Hocr.HocrElements
             }
         }
 
-        private static void ParseTitle(string title, HOcrClass ocrclass)
+        private void ParseTitle(string title, HOcrClass ocrclass)
         {
             if (title == null)
                 return;
