@@ -12,7 +12,6 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Image = iTextSharp.text.Image;
 using Rectangle = iTextSharp.text.Rectangle;
-
 namespace Hocr.Pdf
 {
     public delegate Image ProcessImageForDisplay(System.Drawing.Image image);
@@ -154,15 +153,22 @@ namespace Hocr.Pdf
                             if (OnProcessImageForOcr != null)
                                 img = OnProcessImageForOcr(img);
                             _ocrController.AddToDocument(PdfSettings.Language, image, ref _hDoc, sessionName);
-                            HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
-                            WriteUnderlayContent(page);
-                            pageBody = pageBody + page.TextUnescaped;
+
+                            if (_hDoc.Pages.Count > 0)
+                            {
+                                HPage page = _hDoc.Pages[_hDoc.Pages.Count - 1];
+                                WriteUnderlayContent(page);
+                                pageBody = pageBody + page.TextUnescaped;
+                            }
+
+                            
                         }
                         catch (Exception err)
                         {
                             Console.WriteLine("Error OCR'ing ");
                             Console.WriteLine(err.Message);
                             Console.WriteLine(err.StackTrace);
+                            img.Dispose();
                             throw;
                         }
 
