@@ -26,8 +26,7 @@ namespace Hocr
             }
         }
 
-        private string TemporaryFilePath { get; } = // @"C:\HocrCache\";
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
+        private string TemporaryFilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "cache");
 
         public static TempData Instance => LazyInstance.Value;
 
@@ -38,8 +37,10 @@ namespace Hocr
 
         private static TempData CreateInstanceOfT() { return Activator.CreateInstance(typeof(TempData), true) as TempData; }
 
-        public string CreateNewSession(string sessionName)
+        public string CreateNewSession()
         {
+            string sessionName = Guid.NewGuid().ToString();
+
             if (string.IsNullOrEmpty(sessionName))
                 throw new Exception("Session name cannot be empty!");
 
@@ -66,7 +67,7 @@ namespace Hocr
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                //Console.WriteLine(e);
                 throw new Exception("Cannot Create Session Folder.");
             }
 
@@ -80,7 +81,8 @@ namespace Hocr
                 throw new Exception("Invalid Session");
 
 
-            string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + extensionWithDot);
+            //string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + extensionWithDot);
+            string newFile = Path.Combine(_caches[sessionName], Guid.NewGuid() + extensionWithDot);
             return newFile;
         }
 

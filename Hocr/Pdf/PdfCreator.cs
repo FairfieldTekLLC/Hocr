@@ -164,9 +164,6 @@ namespace Hocr.Pdf
                         }
                         catch (Exception err)
                         {
-                            Console.WriteLine("Error OCR'ing ");
-                            Console.WriteLine(err.Message);
-                            Console.WriteLine(err.StackTrace);
                             img.Dispose();
                             throw;
                         }

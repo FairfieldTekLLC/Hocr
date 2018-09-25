@@ -33,7 +33,7 @@ namespace Hocr.Pdf
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                
             }
 
             TextReader = null;
@@ -64,7 +64,7 @@ namespace Hocr.Pdf
             }
             catch (Exception)
             {
-                Console.WriteLine("Getting page via GhostScript");
+                //Console.WriteLine("Getting page via GhostScript");
                 return GetPageImageWithGhostScript(pageNumber, sessionName);
             }
 
