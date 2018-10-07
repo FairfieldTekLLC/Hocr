@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Threading;
@@ -16,13 +17,15 @@ namespace Hocr.Cmd
 
         static async void Example(byte[] data, string outfile)
         {
-            Tuple<byte[], string> odata = await Task.Run(() => _comp.CreateSearchablePdfAsync(data, new PdfMeta()
+
+
+            Tuple<byte[], string> odata = _comp.CreateSearchablePdf(data, new PdfMeta()
             {
                 Author = "Vince",
                 KeyWords = string.Empty,
                 Subject = string.Empty,
                 Title = string.Empty,
-            }));
+            });
             File.WriteAllBytes(outfile, odata.Item1);
             Console.WriteLine("OCR BODY: " + odata.Item2);
             Console.WriteLine("Finished " + outfile);
@@ -40,19 +43,43 @@ namespace Hocr.Cmd
             //The folder where Tesseract is installed
             const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
 
+            List<string> DistillerOptions = new List<string>();
+            DistillerOptions.Add("-dSubsetFonts=true");
+            DistillerOptions.Add("-dCompressFonts=true");
+            DistillerOptions.Add("-sProcessColorModel=DeviceRGB");
+            DistillerOptions.Add("-sColorConversionStrategy=sRGB");
+            DistillerOptions.Add("-sColorConversionStrategyForImages=sRGB");
+            DistillerOptions.Add("-dConvertCMYKImagesToRGB=true");
+            DistillerOptions.Add("-dDetectDuplicateImages=true");
+            DistillerOptions.Add("-dDownsampleColorImages=false");
+            DistillerOptions.Add("-dDownsampleGrayImages=false");
+            DistillerOptions.Add("-dDownsampleMonoImages=false");
+            DistillerOptions.Add("-dColorImageResolution=265");
+            DistillerOptions.Add("-dGrayImageResolution=265");
+            DistillerOptions.Add("-dMonoImageResolution=265");
+            DistillerOptions.Add("-dDoThumbnails=false");
+            DistillerOptions.Add("-dCreateJobTicket=false");
+            DistillerOptions.Add("-dPreserveEPSInfo=false");
+            DistillerOptions.Add("-dPreserveOPIComments=false");
+            DistillerOptions.Add("-dPreserveOverprintSettings=false");
+            DistillerOptions.Add("-dUCRandBGInfo=/Remove");
+
 
             PdfCompressorSettings pdfSettings = new PdfCompressorSettings
             {
-                ImageType = PdfImageType.Jpg,
-                Dpi = 400,
-                ImageQuality = 100,
+                PdfCompatibilityLevel = PdfCompatibilityLevel.Acrobat_7_1_6,
                 WriteTextMode = WriteTextMode.Word,
+                Dpi = 400,
+                ImageType = PdfImageType.Tif,
+                ImageQuality = 100,
                 CompressFinalPdf = true,
-                PdfCompatibilityLevel = PdfCompatibilityLevel.Acrobat_7_1_6
+                DistillerMode = dPdfSettings.prepress,
+                DistillerOptions = string.Join(" ", DistillerOptions.ToArray())
             };
 
             _comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, pdfSettings);
             _comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
+            _comp.OnCompressorEvent += _comp_OnCompressorEvent;
 
 
             byte[] data = File.ReadAllBytes(@"Test1.pdf");
@@ -80,6 +107,10 @@ namespace Hocr.Cmd
             Console.ReadLine();
         }
 
+        private static void _comp_OnCompressorEvent(string msg)
+        {
+            Console.WriteLine(msg);
+        }
 
         private static void Compressor_OnExceptionOccurred(PdfCompressor c, Exception x)
         {

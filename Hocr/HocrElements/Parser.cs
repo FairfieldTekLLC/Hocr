@@ -14,6 +14,10 @@ namespace Hocr.HocrElements
         private HtmlDocument _doc;
         private HDocument _hDoc;
         private string _hOcrFilePath;
+        private readonly float _dpi;
+
+
+        public Parser(float dpi) { _dpi = dpi; }
 
         private void ParseCharactersForLine(string title)
         {
@@ -34,7 +38,7 @@ namespace Hocr.HocrElements
                 if (i % 4 == 0 && i != 0)
                 {
                     HChar c = new HChar();
-                    BBox b = new BBox(bbox);
+                    BBox b = new BBox(bbox,_dpi);
                     c.BBox = b;
 
                     char[] chars = _currentLine.Text.ToCharArray();
@@ -45,7 +49,7 @@ namespace Hocr.HocrElements
                         word += c.Text;
                         if (w.BBox == null)
                         {
-                            w.BBox = new BBox();
+                            w.BBox = new BBox(_dpi);
                             {
                                 w.BBox.Height = c.BBox.Height;
                                 w.BBox.Left = c.BBox.Left;
@@ -90,7 +94,7 @@ namespace Hocr.HocrElements
             _currentLine.Words.Add(w);
         }
 
-        public  HDocument ParseHocr(HDocument hOrcDoc, string hOcrFile, bool append)
+        public HDocument ParseHocr(HDocument hOrcDoc, string hOcrFile, bool append)
         {
             _hDoc = hOrcDoc;
 
@@ -152,7 +156,7 @@ namespace Hocr.HocrElements
                             break;
 
                         case "ocr_line":
-                            _currentLine = new HLine();
+                            _currentLine = new HLine(_dpi);
                             _currentLine.ClassName = className;
                             _currentLine.Id = id;
                             ParseTitle(title, _currentLine);
@@ -227,7 +231,7 @@ namespace Hocr.HocrElements
                 if (!s.Contains("bbox"))
                     continue;
                 string coords = s.Replace("bbox", "");
-                BBox box = new BBox(coords);
+                BBox box = new BBox(coords,_dpi);
                 ocrclass.BBox = box;
             }
         }

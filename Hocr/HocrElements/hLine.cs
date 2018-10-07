@@ -8,10 +8,12 @@ namespace Hocr.HocrElements
     /// </summary>
     internal class HLine : HOcrClass
     {
-        public HLine()
+        private readonly float _dpi;
+        public HLine(float dpi)
         {
             Words = new List<HWord>();
             LinesInSameSentence = new List<HLine>();
+            _dpi = dpi;
         }
 
         public IList<HLine> LinesInSameSentence { get; set; }
@@ -38,10 +40,10 @@ namespace Hocr.HocrElements
         {
             if (LinesInSameSentence == null || LinesInSameSentence.Count == 0)
                 return this;
-            HLine l = new HLine
+            HLine l = new HLine(_dpi)
             {
                 Id = LinesInSameSentence.OrderBy(x => x.BBox.Left).First().Id,
-                BBox = new BBox
+                BBox = new BBox(_dpi)
                 {
                     Top = LinesInSameSentence.Select(x => x.BBox.Top).Min(),
                     Height = LinesInSameSentence.Last().BBox.Height,

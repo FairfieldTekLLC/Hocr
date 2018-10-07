@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Hocr.HocrElements;
+using Hocr.ImageProcessors;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using Hocr.HocrElements;
-using Hocr.ImageProcessors;
 
 namespace Hocr
 {
@@ -16,12 +16,35 @@ namespace Hocr
 
         internal void AddToDocument(string language, Image image, ref HDocument doc, string sessionName)
         {
-            Bitmap b = ImageProcessor.GetAsBitmap(image, (int) Math.Ceiling(image.HorizontalResolution));
+            Bitmap b = ImageProcessor.GetAsBitmap(image, (int)Math.Ceiling(image.HorizontalResolution));
+
             string imageFile = TempData.Instance.CreateTempFile(sessionName, ".tif");
+
             b.Save(imageFile, ImageFormat.Tiff);
+
             string result = CreateHocr(language, imageFile, sessionName);
+
             doc.AddFile(result);
+
+            b.Dispose();
+
         }
+
+        //internal void AddToDocument(string language, string image, ref HDocument doc, string sessionName)
+        //{
+        //    //Bitmap b = ImageProcessor.GetAsBitmap(image, (int)Math.Ceiling(image.HorizontalResolution));
+
+        //    //string imageFile = TempData.Instance.CreateTempFile(sessionName, ".tif");
+
+        //    //b.Save(imageFile, ImageFormat.Tiff);
+
+        //    string result = CreateHocr(language, image, sessionName);
+
+        //    doc.AddFile(result);
+
+        //  //  b.Dispose();
+
+        //}
 
         public string CreateHocr(string language, string imagePath, string sessionName)
         {
@@ -30,6 +53,7 @@ namespace Hocr
             string outputFile = Path.Combine(dataPath, Path.GetFileNameWithoutExtension(Path.GetRandomFileName()));
             const string processName = "tesseract.exe";
             string commandArgs = $" {'"'}{imagePath}{'"'} {'"'}{outputFile}{'"'} -l {language} -psm 1 hocr ";
+            
             RunCommand(processName, commandArgs);
             return outputFile + ".hocr";
         }
@@ -58,11 +82,11 @@ namespace Hocr
                     proc?.WaitForExit();
                     //string output = proc.StandardOutput.ReadToEnd();
                     //string errOut = proc.StandardError.ReadToEnd();
-                    //////if (!string.IsNullOrEmpty(output))
-                    //Console.WriteLine(output);
-                    //////if (!string.IsNullOrEmpty(errOut))
-                    //Console.WriteLine(errOut);
-                    ////Console.WriteLine("Finished Tesseract Process");
+                    //if (!string.IsNullOrEmpty(output))
+                    //    Console.WriteLine(output);
+                    //if (!string.IsNullOrEmpty(errOut))
+                    //    Console.WriteLine(errOut);
+                    //Console.WriteLine("Finished Tesseract Process");
                 }
             }
             catch (Exception e)

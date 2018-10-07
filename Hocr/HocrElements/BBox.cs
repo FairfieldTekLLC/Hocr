@@ -1,14 +1,22 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Text;
 
 namespace Hocr.HocrElements
 {
     internal class BBox
     {
-        public BBox() { Format = UnitFormat.Pixel; }
+        private readonly float _dpi;
 
-        public BBox(string boxvalues)
+        public BBox(float dpi)
         {
+            Format = UnitFormat.Pixel;
+            _dpi = dpi;
+        }
+
+        public BBox(string boxvalues,float dpi)
+        {
+            _dpi = dpi;
             string[] values = boxvalues.Trim().Split(new char[char.MinValue]);
             if (values.Length < 4)
                 return;
@@ -35,28 +43,28 @@ namespace Hocr.HocrElements
 
         public float CenterLine => Top + Height / 2;
 
-        public BBox DefaultPointBBox => ConvertBBoxToPoints(this, 300);
+        public BBox DefaultPointBBox => ConvertBBoxToPoints(this,_dpi);
 
         public UnitFormat Format { get; set; }
         public float Height { get; set; }
         public float Left { get; set; }
 
-        public Rectangle Rectangle => new Rectangle(new Point((int) Left, (int) Top), new Size((int) Width, (int) Height));
+        //public Rectangle Rectangle => new Rectangle(new Point((int) Left, (int) Top), new Size((int) Width, (int) Height));
 
         public float Top { get; set; }
         public float Width { get; set; }
 
-        public static BBox ConvertBBoxToPoints(BBox bbox, int resolution)
+        public static  BBox ConvertBBoxToPoints(BBox bbox,float dpi)
         {
-            if (resolution == 0)
-                resolution = 300;
+            if (dpi == 0)
+                throw new Exception("DPI is zero.");
 
-            BBox newBbox = new BBox
+            BBox newBbox = new BBox(dpi)
             {
-                Left = bbox.Left * 72 / resolution,
-                Top = bbox.Top * 72 / resolution,
-                Width = bbox.Width * 72 / resolution,
-                Height = bbox.Height * 72 / resolution,
+                Left = bbox.Left * 72 / dpi,
+                Top = bbox.Top * 72 / dpi,
+                Width = bbox.Width * 72 / dpi,
+                Height = bbox.Height * 72 / dpi,
                 Format = UnitFormat.Point
             };
             return newBbox;

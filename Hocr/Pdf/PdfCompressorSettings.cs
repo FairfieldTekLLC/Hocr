@@ -7,7 +7,7 @@ namespace Hocr.Pdf
     {
         public PdfCompressorSettings()
         {
-            Dpi = 600;
+            Dpi = 400;
 
             ImageType = PdfImageType.Png;
 
@@ -44,5 +44,9 @@ namespace Hocr.Pdf
         public bool CompressFinalPdf { get; set; } = true;
 
         public PdfCompatibilityLevel PdfCompatibilityLevel { get; set; } = PdfCompatibilityLevel.Acrobat_7_1_6;
+
+        public dPdfSettings DistillerMode { get; set; } = dPdfSettings.printer;
+
+        public string DistillerOptions { get; set; } = string.Empty;
     }
 }

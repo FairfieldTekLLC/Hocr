@@ -82,7 +82,8 @@ namespace Hocr
 
 
             //string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + extensionWithDot);
-            string newFile = Path.Combine(_caches[sessionName], Guid.NewGuid() + extensionWithDot);
+            
+            string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + DateTime.Now.Second.ToString() + DateTime.Now.Millisecond.ToString() + extensionWithDot);
             return newFile;
         }
 

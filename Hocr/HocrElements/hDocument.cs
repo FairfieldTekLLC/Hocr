@@ -4,12 +4,16 @@ namespace Hocr.HocrElements
 {
     internal class HDocument : HOcrClass
     {
-        private readonly Parser Parser = new Parser();
+        private readonly Parser _parser;
 
-        public HDocument() { Pages = new List<HPage>(); }
+        public HDocument(float dpi)
+        {
+            Pages = new List<HPage>();
+            _parser = new Parser(dpi);
+        }
 
         public IList<HPage> Pages { get; set; }
 
-        public void AddFile(string hocrFile) { Parser.ParseHocr(this, hocrFile, true); }
+        public void AddFile(string hocrFile) { _parser.ParseHocr(this, hocrFile, true); }
     }
 }

@@ -85,6 +85,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\dImageDownSampleType.cs" />
+    <Compile Include="Enums\dPdfSettings.cs" />
     <Compile Include="Enums\PdfCompatibilityLevel.cs" />
     <Compile Include="Enums\PdfImageType.cs" />
     <Compile Include="Enums\PdfMode.cs" />
@@ -102,15 +104,11 @@
     <Compile Include="ImageProcessors\GhostScript.cs" />
     <Compile Include="ImageProcessors\ImageProcessor.cs" />
     <Compile Include="OcrController.cs" />
-    <Compile Include="Pdf\MyImageRenderListener.cs" />
-    <Compile Include="Pdf\PageSizes.cs" />
-    <Compile Include="Pdf\ParsedPageImage.cs" />
     <Compile Include="Pdf\PdfCompressor.cs" />
     <Compile Include="Pdf\PdfCreator.cs" />
     <Compile Include="Pdf\PdfMeta.cs" />
     <Compile Include="Pdf\PdfReader.cs" />
     <Compile Include="Pdf\PdfCompressorSettings.cs" />
-    <Compile Include="Pdf\PdfTextExtractionStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TempData.cs" />
   </ItemGroup>
