@@ -4,7 +4,7 @@ C# Library for converting PDF files to Searchable PDF Files
 * Need to batch convert 100 of scan PDF's to Searchable PFS's?
 * Don't want to pay thousands of dollars for a component?
 
-
+I have personally tested this library with over 110 thousand PDFs.  Beyond a few fringe cases the code has performed as it was designed..  I was able to process 110k pdfs (Some hundreds of pages) over a 3 day period using 5 servers.
 
 ## Use Hocr!
 
