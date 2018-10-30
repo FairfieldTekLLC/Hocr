@@ -21,98 +21,162 @@ So, to run this, run the installers (or download them yourself)
 
 Example Usage:
 ```C#
-using System;
-using System.Data;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Hocr.Enums;
 using Hocr.Pdf;
+using System.IO;
 
-namespace Hocr.Cmd
+namespace Hocr.Test.Console
 {
     class Program
     {
-        private static bool _running = true;
-
-        private static int FileCounter = 3;
-
-        static async void Example(byte[] data, string outfile)
-        {
-            byte[] odata = await Task.Run(() => comp.CreateSearchablePdf(data, new PdfMeta()
-            {
-                Author = "Vince",
-                KeyWords = string.Empty,
-                Subject = string.Empty,
-                Title = string.Empty,
-            }));
-            File.WriteAllBytes(outfile, odata);
-            Console.WriteLine("Finished " + outfile);
-            FileCounter = FileCounter - 1;
-            if (FileCounter == 0)
-                Environment.Exit(0);
-
-        }
-
-        static PdfCompressor comp;
-
         static void Main(string[] args)
         {
-            //The folder and path for ghostscript
-            const string ghostScriptPathToExecutable = @"C:\gs\gs9.24\bin\gswin64c.exe";
-            //The folder where Tesseract is installed
-            const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
-
-
-            PdfCompressorSettings PdfSettings = new PdfCompressorSettings
+            Hocr.Pdf.PdfCompressor comp;
+            List<string> DistillerOptions = new List<string>();
+            if (1 == 1)
             {
-                ImageType = PdfImageType.JBig2,
-                Dpi = 400,
-                ImageQuality = 100,
-                WriteTextMode = WriteTextMode.Word
-            };
 
-            comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, PdfSettings);
-            comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
+                DistillerOptions.Add("-dSubsetFonts=true");
+                DistillerOptions.Add("-dCompressFonts=true");
+                DistillerOptions.Add("-sProcessColorModel=DeviceRGB");
+                DistillerOptions.Add("-sColorConversionStrategy=sRGB");
+                DistillerOptions.Add("-sColorConversionStrategyForImages=sRGB");
+                DistillerOptions.Add("-dConvertCMYKImagesToRGB=true");
+                DistillerOptions.Add("-dDetectDuplicateImages=true");
+                DistillerOptions.Add("-dDownsampleColorImages=false");
+                DistillerOptions.Add("-dDownsampleGrayImages=false");
+                DistillerOptions.Add("-dDownsampleMonoImages=false");
+                DistillerOptions.Add("-dColorImageResolution=265");
+                DistillerOptions.Add("-dGrayImageResolution=265");
+                DistillerOptions.Add("-dMonoImageResolution=265");
+                DistillerOptions.Add("-dDoThumbnails=false");
+                DistillerOptions.Add("-dCreateJobTicket=false");
+                DistillerOptions.Add("-dPreserveEPSInfo=false");
+                DistillerOptions.Add("-dPreserveOPIComments=false");
+                DistillerOptions.Add("-dPreserveOverprintSettings=false");
+                DistillerOptions.Add("-dUCRandBGInfo=/Remove");
 
 
-            byte[] data = File.ReadAllBytes(@"Test1.pdf");
-            byte[] data1 = File.ReadAllBytes(@"Test2.pdf");
-            byte[] data2 = File.ReadAllBytes(@"Test3.pdf");
-
-            Example(data, @"Test1_ocr.pdf");
-            Console.WriteLine("Started Test 1");
-
-            Example(data1, @"Test2_ocr.pdf");
-            Console.WriteLine("Starting Test 2");
-
-            Example(data2, @"Test3_ocr.pdf");
-            Console.WriteLine("Starting Test 3");
-
-            int counter = 0;
-            while (_running)
-            {
-                Thread.Sleep(1000);
-                Console.WriteLine("Working...." + counter);
-                counter++;
+                comp = new Hocr.Pdf.PdfCompressor("C:\\gs\\bin\\gswin32c.exe", "C:\\Tesseract-OCR\\", new PdfCompressorSettings()
+                {
+                    PdfCompatibilityLevel = PdfCompatibilityLevel.Acrobat_7_1_6,
+                    WriteTextMode = WriteTextMode.Word,
+                    Dpi = 400,
+                    ImageType = PdfImageType.Tif,
+                    ImageQuality = 100,
+                    CompressFinalPdf = true,
+                    DistillerMode = dPdfSettings.prepress,
+                    DistillerOptions = string.Join(" ", DistillerOptions.ToArray())
+                });
             }
-            Console.WriteLine("Finished!");
-            Console.ReadLine();
+            if (1 == 0)
+            {
+                
+                DistillerOptions.Add("-dSubsetFonts=true");
+                DistillerOptions.Add("-dCompressFonts=true");
+                DistillerOptions.Add("-sProcessColorModel=DeviceRGB");
+                DistillerOptions.Add("-sColorConversionStrategy=sRGB");
+                DistillerOptions.Add("-sColorConversionStrategyForImages=sRGB");
+                DistillerOptions.Add("-dConvertCMYKImagesToRGB=true");
+                DistillerOptions.Add("-dDetectDuplicateImages=true");
+                DistillerOptions.Add("-dDownsampleColorImages=true");
+                DistillerOptions.Add("-dDownsampleGrayImages=true");
+                DistillerOptions.Add("-dDownsampleMonoImages=true");
+                DistillerOptions.Add("-dColorImageResolution=265");
+                DistillerOptions.Add("-dGrayImageResolution=265");
+                DistillerOptions.Add("-dMonoImageResolution=265");
+                DistillerOptions.Add("-dDoThumbnails=false");
+                DistillerOptions.Add("-dCreateJobTicket=false");
+                DistillerOptions.Add("-dPreserveEPSInfo=false");
+                DistillerOptions.Add("-dPreserveOPIComments=false");
+                DistillerOptions.Add("-dPreserveOverprintSettings=false");
+                DistillerOptions.Add("-dUCRandBGInfo=/Remove");
+
+
+                comp = new Hocr.Pdf.PdfCompressor("C:\\gs\\bin\\gswin32c.exe", "C:\\Tesseract-OCR\\", new PdfCompressorSettings()
+                {
+                    PdfCompatibilityLevel = PdfCompatibilityLevel.Acrobat_7_1_6,
+                    WriteTextMode = WriteTextMode.Word,
+                    Dpi = 400,
+                    ImageType = PdfImageType.Tif,
+                    ImageQuality = 100,
+                    CompressFinalPdf = true,
+                    DistillerMode = dPdfSettings.prepress,
+                    DistillerOptions = string.Join(" ", DistillerOptions.ToArray())
+                });
+            }
+
+            if (1 == 0)
+            {
+
+                DistillerOptions.Add("-dSubsetFonts=true");
+                DistillerOptions.Add("-dCompressFonts=true");
+                DistillerOptions.Add("-sProcessColorModel=DeviceCMYK");
+                DistillerOptions.Add("-dUseCIEColor=true");
+
+                DistillerOptions.Add("-sColorConversionStrategy=sLeaveColorUnchanged");
+
+                DistillerOptions.Add("-sColorConversionStrategyForImages=sLeaveColorUnchanged");
+
+                DistillerOptions.Add("-dConvertCMYKImagesToRGB=false");
+
+                DistillerOptions.Add("-dDetectDuplicateImages=true");
+
+                DistillerOptions.Add("-dDownsampleColorImages=false");
+
+                DistillerOptions.Add("-dDownsampleGrayImages=false");
+
+                DistillerOptions.Add("-dDownsampleMonoImages=false");
+
+                DistillerOptions.Add("-dColorImageResolution=300");
+
+                DistillerOptions.Add("-dGrayImageResolution=300");
+
+                DistillerOptions.Add("-dMonoImageResolution=300");
+
+                DistillerOptions.Add("-dDoThumbnails=false");
+
+                DistillerOptions.Add("-dCreateJobTicket=false");
+
+                DistillerOptions.Add("-dPreserveEPSInfo=false");
+
+                DistillerOptions.Add("-dPreserveOPIComments=false");
+
+                DistillerOptions.Add("-dPreserveOverprintSettings=false");
+
+                DistillerOptions.Add("-dUCRandBGInfo=/Remove");
+
+
+                comp = new Hocr.Pdf.PdfCompressor("C:\\gs\\bin\\gswin32c.exe", "C:\\Tesseract-OCR\\", new PdfCompressorSettings()
+                {
+                    PdfCompatibilityLevel = PdfCompatibilityLevel.Acrobat_7_1_6,
+                    WriteTextMode = WriteTextMode.Word,
+                    Dpi = 300,
+                    ImageType = PdfImageType.Jpg,
+                    ImageQuality = 100,
+                    CompressFinalPdf = true,
+                    DistillerMode = dPdfSettings.prepress,
+                    DistillerOptions = string.Join(" ", DistillerOptions.ToArray())
+                });
+            }
+
+
+            comp.OnCompressorEvent += Comp_OnCompressorEvent;
+
+            foreach (string file in Directory.GetFiles("C:\\pdfin"))
+            {
+                byte[] data = File.ReadAllBytes(file);
+                System.Tuple<byte[], string> result = comp.CreateSearchablePdf(data, new PdfMeta());
+                File.WriteAllBytes("c:\\PDFOUT\\" + Path.GetFileName(file), result.Item1);
+            }
 
         }
 
-
-        private static void Compressor_OnExceptionOccurred(PdfCompressor c, Exception x)
-        {
-            Console.WriteLine("Exception Occured! ");
-            Console.WriteLine(x.Message);
-            Console.WriteLine(x.StackTrace);
-            _running = false;
-        }
-
-
+        private static void Comp_OnCompressorEvent(string msg) { System.Console.WriteLine(msg); }
     }
 }
+
 ```
 
 Special Thanks to Koolprasadd for his original article at:  https://tech.io/playgrounds/10058/scanned-pdf-to-ocr-textsearchable-pdf-using-c
