@@ -9,6 +9,7 @@ namespace Hocr.HocrElements
     internal class HLine : HOcrClass
     {
         private readonly float _dpi;
+
         public HLine(float dpi)
         {
             Words = new List<HWord>();

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Text;
 
 namespace Hocr.HocrElements
@@ -14,7 +13,7 @@ namespace Hocr.HocrElements
             _dpi = dpi;
         }
 
-        public BBox(string boxvalues,float dpi)
+        public BBox(string boxvalues, float dpi)
         {
             _dpi = dpi;
             string[] values = boxvalues.Trim().Split(new char[char.MinValue]);
@@ -43,18 +42,19 @@ namespace Hocr.HocrElements
 
         public float CenterLine => Top + Height / 2;
 
-        public BBox DefaultPointBBox => ConvertBBoxToPoints(this,_dpi);
+        public BBox DefaultPointBBox => ConvertBBoxToPoints(this, _dpi);
 
         public UnitFormat Format { get; set; }
+
         public float Height { get; set; }
+
         public float Left { get; set; }
 
-        //public Rectangle Rectangle => new Rectangle(new Point((int) Left, (int) Top), new Size((int) Width, (int) Height));
-
         public float Top { get; set; }
+
         public float Width { get; set; }
 
-        public static  BBox ConvertBBoxToPoints(BBox bbox,float dpi)
+        public static BBox ConvertBBoxToPoints(BBox bbox, float dpi)
         {
             if (dpi == 0)
                 throw new Exception("DPI is zero.");

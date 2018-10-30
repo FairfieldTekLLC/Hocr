@@ -2,8 +2,14 @@
 {
     public enum WriteTextMode
     {
+        /// <summary>
+        ///     Line works, but word is preferred
+        /// </summary>
         Line,
-        Word,
-        Character
+
+        /// <summary>
+        ///     Preferred method of placing ocr words, places it more accurately.
+        /// </summary>
+        Word
     }
 }

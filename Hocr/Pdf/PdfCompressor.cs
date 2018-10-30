@@ -1,8 +1,8 @@
-﻿using Hocr.Enums;
-using Hocr.ImageProcessors;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
+using Hocr.Enums;
+using Hocr.ImageProcessors;
 using Rectangle = iTextSharp.text.Rectangle;
 
 namespace Hocr.Pdf
@@ -37,7 +37,8 @@ namespace Hocr.Pdf
             PdfReader reader = new PdfReader(inputFileName, GhostScriptPath, PdfSettings.Dpi);
 
             OnCompressorEvent?.Invoke(sessionName + " Creating PDF Writer");
-            PdfCreator writer = new PdfCreator(PdfSettings, outputFileName, TesseractPath, meta, PdfSettings.Dpi) { PdfSettings = { WriteTextMode = PdfSettings.WriteTextMode } };
+            PdfCreator writer =
+                new PdfCreator(PdfSettings, outputFileName, TesseractPath, meta, PdfSettings.Dpi) {PdfSettings = {WriteTextMode = PdfSettings.WriteTextMode}};
 
             try
             {
@@ -45,15 +46,13 @@ namespace Hocr.Pdf
                 {
                     OnCompressorEvent?.Invoke(sessionName + " Processing page " + i + " of " + reader.PageCount);
                     string img = reader.GetPageImage(i, sessionName, this);
-                    if (OnPreProcessImage != null)
-                    {
-                        img = OnPreProcessImage(img);
-                    }
+                    if (OnPreProcessImage != null) img = OnPreProcessImage(img);
                     Bitmap chk = new Bitmap(img);
                     Rectangle pageSize = new Rectangle(0, 0, chk.Width, chk.Height);
                     chk.Dispose();
                     pageBody = pageBody + writer.AddPage(img, PdfMode.Ocr, sessionName, pageSize);
                 }
+
                 writer.SaveAndClose();
                 writer.Dispose();
                 reader.Dispose();
@@ -67,12 +66,14 @@ namespace Hocr.Pdf
                 reader.Dispose();
                 OnExceptionOccurred?.Invoke(this, x);
             }
+
             return "";
         }
 
         public event CompressorExceptionOccurred OnExceptionOccurred;
         public event CompressorEvent OnCompressorEvent;
         public event PreProcessImage OnPreProcessImage;
+
         public Tuple<byte[], string> CreateSearchablePdf(byte[] fileData, PdfMeta metaData)
         {
             try
@@ -88,6 +89,7 @@ namespace Hocr.Pdf
                     writer.Write(fileData, 0, fileData.Length);
                     writer.Flush(true);
                 }
+
                 OnCompressorEvent?.Invoke(sessionName + " Wrote binary to file");
                 OnCompressorEvent?.Invoke(sessionName + " Begin Compress and Ocr");
                 string pageBody = CompressAndOcr(sessionName, inputDataFilePath, outputDataFilePath, metaData);
@@ -96,9 +98,10 @@ namespace Hocr.Pdf
                 {
                     OnCompressorEvent?.Invoke(sessionName + " Compressing output");
                     GhostScript gs = new GhostScript(GhostScriptPath, PdfSettings.Dpi);
-                    //outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel, dImageDownSampleType.Bicubic, dPdfSettings.printer);
-                    outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel, PdfSettings.DistillerMode, PdfSettings.DistillerOptions);
+                    outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel, PdfSettings.DistillerMode,
+                        PdfSettings.DistillerOptions);
                 }
+
                 byte[] outFile = File.ReadAllBytes(outputFileName);
                 OnCompressorEvent?.Invoke(sessionName + " Destroying session");
                 TempData.Instance.DestroySession(sessionName);

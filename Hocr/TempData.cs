@@ -67,7 +67,6 @@ namespace Hocr
             }
             catch (Exception e)
             {
-                //Console.WriteLine(e);
                 throw new Exception("Cannot Create Session Folder.");
             }
 
@@ -79,11 +78,8 @@ namespace Hocr
         {
             if (!_caches.ContainsKey(sessionName))
                 throw new Exception("Invalid Session");
-
-
-            //string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + extensionWithDot);
-            
-            string newFile = Path.Combine(_caches[sessionName], Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + DateTime.Now.Second.ToString() + DateTime.Now.Millisecond.ToString() + extensionWithDot);
+            string newFile = Path.Combine(_caches[sessionName],
+                Path.GetFileNameWithoutExtension(Path.GetRandomFileName()) + DateTime.Now.Second + DateTime.Now.Millisecond + extensionWithDot);
             return newFile;
         }
 

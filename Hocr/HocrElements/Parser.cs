@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,13 +9,13 @@ namespace Hocr.HocrElements
 {
     internal class Parser
     {
+        private readonly float _dpi;
         private HLine _currentLine;
         private HPage _currentPage;
         private HParagraph _currentPara;
         private HtmlDocument _doc;
         private HDocument _hDoc;
         private string _hOcrFilePath;
-        private readonly float _dpi;
 
 
         public Parser(float dpi) { _dpi = dpi; }
@@ -38,7 +39,7 @@ namespace Hocr.HocrElements
                 if (i % 4 == 0 && i != 0)
                 {
                     HChar c = new HChar();
-                    BBox b = new BBox(bbox,_dpi);
+                    BBox b = new BBox(bbox, _dpi);
                     c.BBox = b;
 
                     char[] chars = _currentLine.Text.ToCharArray();
@@ -113,8 +114,14 @@ namespace Hocr.HocrElements
 
 
             HtmlNode body = _doc.DocumentNode.SelectNodes("//body")[0];
+            HtmlNodeCollection nodes1 = body.SelectNodes("//div");
+            //#Issue #1 reported by Ryan-George
+            IEnumerable<HtmlNode> divs = body.ChildNodes.Where(node => node.Name.ToLower() == "div");
+            HtmlNodeCollection nodes = new HtmlNodeCollection(null);
+            foreach (HtmlNode div in divs) nodes.Add(div);
+
             _hDoc.ClassName = "body";
-            HtmlNodeCollection nodes = body.SelectNodes("//div");
+
             ParseNodes(nodes);
             return _hDoc;
         }
@@ -231,7 +238,7 @@ namespace Hocr.HocrElements
                 if (!s.Contains("bbox"))
                     continue;
                 string coords = s.Replace("bbox", "");
-                BBox box = new BBox(coords,_dpi);
+                BBox box = new BBox(coords, _dpi);
                 ocrclass.BBox = box;
             }
         }
