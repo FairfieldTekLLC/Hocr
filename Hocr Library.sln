@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hocr", "Hocr\Hocr.csproj", "{B66E2D37-3E66-4033-87D2-37AD3485A549}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net.FairfieldTek.Hocr", "Hocr\Net.FairfieldTek.Hocr.csproj", "{B66E2D37-3E66-4033-87D2-37AD3485A549}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hocr.Cmd", "Hocr.Cmd\Hocr.Cmd.csproj", "{A995D5CA-0A00-45ED-812B-110EE38D8FE7}"
 EndProject

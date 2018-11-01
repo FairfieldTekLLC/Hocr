@@ -99,9 +99,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hocr\Hocr.csproj">
+    <ProjectReference Include="..\Hocr\Net.FairfieldTek.Hocr.csproj">
       <Project>{b66e2d37-3e66-4033-87d2-37ad3485a549}</Project>
-      <Name>Hocr</Name>
+      <Name>Net.FairfieldTek.Hocr</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
