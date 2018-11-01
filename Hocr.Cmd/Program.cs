@@ -34,9 +34,6 @@ namespace Hocr.Cmd
 
         private static void Main(string[] args)
         {
-            //The folder where Tesseract is installed
-            const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
-
             List<string> distillerOptions = new List<string>
             {
                 "-dSubsetFonts=true",
@@ -73,7 +70,7 @@ namespace Hocr.Cmd
                 DistillerOptions = string.Join(" ", distillerOptions.ToArray())
             };
 
-            _comp = new PdfCompressor( tesseractApplicationFolder, pdfSettings);
+            _comp = new PdfCompressor(pdfSettings);
             _comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
             _comp.OnCompressorEvent += _comp_OnCompressorEvent;
 

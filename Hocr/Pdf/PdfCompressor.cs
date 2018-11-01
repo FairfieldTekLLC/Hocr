@@ -15,18 +15,11 @@ namespace Hocr.Pdf
 
     public class PdfCompressor
     {
-        public PdfCompressor(string tesseractPath, PdfCompressorSettings settings = null)
+        public PdfCompressor(PdfCompressorSettings settings = null)
         {
-            TesseractPath = tesseractPath;
-            
             PdfSettings = settings ?? new PdfCompressorSettings();
         }
-
         
-
-        private string TesseractPath { get; }
-
-
         public PdfCompressorSettings PdfSettings { get; }
 
         private string CompressAndOcr(string sessionName, string inputFileName, string outputFileName, PdfMeta meta)
@@ -38,7 +31,7 @@ namespace Hocr.Pdf
 
             OnCompressorEvent?.Invoke(sessionName + " Creating PDF Writer");
             PdfCreator writer =
-                new PdfCreator(PdfSettings, outputFileName, TesseractPath, meta, PdfSettings.Dpi) {PdfSettings = {WriteTextMode = PdfSettings.WriteTextMode}};
+                new PdfCreator(PdfSettings, outputFileName,  meta, PdfSettings.Dpi) {PdfSettings = {WriteTextMode = PdfSettings.WriteTextMode}};
 
             try
             {

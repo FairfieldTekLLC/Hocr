@@ -27,9 +27,9 @@ namespace Hocr.Pdf
         private HDocument _hDoc;
         private PdfWriter _writer;
 
-        public PdfCreator(PdfCompressorSettings settings, string newPdf, string tesseractPath, PdfMeta meta, float dpi)
+        public PdfCreator(PdfCompressorSettings settings, string newPdf,  PdfMeta meta, float dpi)
         {
-            _ocrController = new OcrController(tesseractPath);
+            _ocrController = new OcrController();
             PdfSettings = settings;
             PdfFilePath = newPdf;
             SetupDocumentWriter(newPdf, meta.Author, meta.Title, meta.Subject, meta.KeyWords);
