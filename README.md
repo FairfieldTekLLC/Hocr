@@ -6,18 +6,9 @@ C# Library for converting PDF files to Searchable PDF Files
 
 I have personally tested this library with over 110 thousand PDFs.  Beyond a few fringe cases the code has performed as it was designed..  I was able to process 110k pdfs (Some hundreds of pages) over a 3 day period using 5 servers.
 
+Internally, Hocr uses Tesseract, GhostScript, iTextSharp and the HtmlAgilityPack.  Please check the licensing for each nuget to make sure you are in compliance.
+
 ## Use Hocr!
-
-Hocr requires:
-
-* GhostScript to be instaled
-* Windows Tesseract to be installed
-
-I have included the installers I used when I tested this build in the "Installers" folder.
-So, to run this, run the installers (or download them yourself)
-
-* Tesseract for Windows https://github.com/UB-Mannheim/tesseract/wiki
-* Ghost Script: https://www.ghostscript.com/
 
 Example Usage:
 ```C#
