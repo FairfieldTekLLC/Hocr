@@ -1,31 +1,53 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using Ghostscript.NET;
+using Ghostscript.NET.Processor;
 using Hocr.Enums;
+using Hocr.Util;
 
 namespace Hocr.ImageProcessors
 {
     internal class GhostScript
     {
         private readonly int _dpi;
-        private readonly string _path;
+        
 
-        public GhostScript(string path, int dpi)
+        public GhostScript( int dpi)
         {
-            _path = path;
+        
             _dpi = dpi;
         }
+
+        private static string DllFile => Path.Combine(
+            Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) ?? throw new InvalidOperationException(),
+            "dlls",
+            BuildDetect.InternalCheckIsWow64() ? "gsdll32.dll" : "gsdll64.dll");
 
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
             string outPut = GetOutPutFileName(sessionName, ".bmp");
             pdf = "\"" + pdf + "\"";
 
-
-            string command = string.Concat($"-dNOPAUSE -q -r{_dpi} -sDEVICE=bmp16m -dBATCH -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -dFirstPage=",
-                startPageNum.ToString(), " -dLastPage=", endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " -c quit");
-
-            RunCommand(command);
+            GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllFile)));
+            List<string> switches = new List<string>
+            {
+                "-dNOPAUSE",
+                "-q",
+                $"-r{_dpi}",
+                "-sDEVICE=bmp16m",
+                "-dBATCH",
+                "-dGraphicsAlphaBits=4",
+                "-dTextAlphaBits=4",
+                $"-dFirstPage={startPageNum}",
+                $"-dLastPage={endPageNum}",
+                $"-sOutputFile={outPut}",
+                pdf,
+                "-c",
+                "quit"
+            };
+            proc.Process(switches.ToArray());
             return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
         }
 
@@ -62,28 +84,26 @@ namespace Hocr.ImageProcessors
             }
 
             string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-            string command =
-                $@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/{dPdfSettings} {options} -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
-            RunCommand(command);
-            return outPutFileName;
-        }
 
-        private void RunCommand(string command)
-        {
-            ProcessStartInfo startexe = new ProcessStartInfo(_path, command)
+
+            GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllFile)));
+            List<string> switches = new List<string>
             {
-                WorkingDirectory = Directory.GetCurrentDirectory(),
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = false,
-                RedirectStandardOutput = true,
-                UseShellExecute = false
+                "-q",
+                "-dNOPAUSE",
+                "-dBATCH",
+                "-dSAFER",
+                "-sDEVICE=pdfwrite",
+                $"-dCompatibilityLevel={clevel}",
+                $"-dPDFSETTINGS=/{dPdfSettings}",
+                options,
+                $"-sOutputFile={'"'}{outPutFileName}{'"'}",
+                $"{'"'}{inputPdf}{'"'}",
+                "-c",
+                "quit"
             };
-            using (Process proc = Process.Start(startexe))
-            {
-                proc?.WaitForExit();
-            }
+            proc.Process(switches.ToArray());
+            return outPutFileName;
         }
     }
 }

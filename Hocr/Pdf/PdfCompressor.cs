@@ -15,14 +15,14 @@ namespace Hocr.Pdf
 
     public class PdfCompressor
     {
-        public PdfCompressor(string ghostScriptPath, string tesseractPath, PdfCompressorSettings settings = null)
+        public PdfCompressor(string tesseractPath, PdfCompressorSettings settings = null)
         {
             TesseractPath = tesseractPath;
-            GhostScriptPath = ghostScriptPath;
+            
             PdfSettings = settings ?? new PdfCompressorSettings();
         }
 
-        private string GhostScriptPath { get; }
+        
 
         private string TesseractPath { get; }
 
@@ -34,7 +34,7 @@ namespace Hocr.Pdf
             string pageBody = "";
 
             OnCompressorEvent?.Invoke(sessionName + " Creating PDF Reader");
-            PdfReader reader = new PdfReader(inputFileName, GhostScriptPath, PdfSettings.Dpi);
+            PdfReader reader = new PdfReader(inputFileName,  PdfSettings.Dpi);
 
             OnCompressorEvent?.Invoke(sessionName + " Creating PDF Writer");
             PdfCreator writer =
@@ -97,7 +97,7 @@ namespace Hocr.Pdf
                 if (PdfSettings.CompressFinalPdf)
                 {
                     OnCompressorEvent?.Invoke(sessionName + " Compressing output");
-                    GhostScript gs = new GhostScript(GhostScriptPath, PdfSettings.Dpi);
+                    GhostScript gs = new GhostScript( PdfSettings.Dpi);
                     outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel, PdfSettings.DistillerMode,
                         PdfSettings.DistillerOptions);
                 }

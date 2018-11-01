@@ -12,6 +12,7 @@ namespace Hocr
     {
         private readonly string _path;
         public OcrController(string path) { _path = path; }
+
         internal void AddToDocument(string language, Image image, ref HDocument doc, string sessionName)
         {
             Bitmap b = ImageProcessor.GetAsBitmap(image, (int) Math.Ceiling(image.HorizontalResolution));
@@ -21,6 +22,7 @@ namespace Hocr
             doc.AddFile(result);
             b.Dispose();
         }
+
         public string CreateHocr(string language, string imagePath, string sessionName)
         {
             string dataFolder = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
@@ -31,6 +33,7 @@ namespace Hocr
             RunCommand(processName, commandArgs);
             return outputFile + ".hocr";
         }
+
         private void RunCommand(string processName, string commandArgs)
         {
             string pgmExec = Path.Combine(_path, processName);

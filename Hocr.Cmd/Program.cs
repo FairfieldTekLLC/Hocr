@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Hocr.Enums;
 using Hocr.Pdf;
 
 namespace Hocr.Cmd
 {
-    class Program
+    internal class Program
     {
         private static bool _running = true;
 
         private static int _fileCounter = 3;
 
-        static async void Example(byte[] data, string outfile)
+        private static PdfCompressor _comp;
+
+        public static void Example(byte[] data, string outfile)
         {
-
-
-            Tuple<byte[], string> odata = _comp.CreateSearchablePdf(data, new PdfMeta()
+            Tuple<byte[], string> odata = _comp.CreateSearchablePdf(data, new PdfMeta
             {
                 Author = "Vince",
                 KeyWords = string.Empty,
                 Subject = string.Empty,
-                Title = string.Empty,
+                Title = string.Empty
             });
             File.WriteAllBytes(outfile, odata.Item1);
             Console.WriteLine("OCR BODY: " + odata.Item2);
@@ -34,35 +32,33 @@ namespace Hocr.Cmd
                 Environment.Exit(0);
         }
 
-        static PdfCompressor _comp;
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            //The folder and path for ghostscript
-            const string ghostScriptPathToExecutable = @"C:\gs\gs9.24\bin\gswin64c.exe";
             //The folder where Tesseract is installed
             const string tesseractApplicationFolder = @"C:\Tesseract-OCR\";
 
-            List<string> DistillerOptions = new List<string>();
-            DistillerOptions.Add("-dSubsetFonts=true");
-            DistillerOptions.Add("-dCompressFonts=true");
-            DistillerOptions.Add("-sProcessColorModel=DeviceRGB");
-            DistillerOptions.Add("-sColorConversionStrategy=sRGB");
-            DistillerOptions.Add("-sColorConversionStrategyForImages=sRGB");
-            DistillerOptions.Add("-dConvertCMYKImagesToRGB=true");
-            DistillerOptions.Add("-dDetectDuplicateImages=true");
-            DistillerOptions.Add("-dDownsampleColorImages=false");
-            DistillerOptions.Add("-dDownsampleGrayImages=false");
-            DistillerOptions.Add("-dDownsampleMonoImages=false");
-            DistillerOptions.Add("-dColorImageResolution=265");
-            DistillerOptions.Add("-dGrayImageResolution=265");
-            DistillerOptions.Add("-dMonoImageResolution=265");
-            DistillerOptions.Add("-dDoThumbnails=false");
-            DistillerOptions.Add("-dCreateJobTicket=false");
-            DistillerOptions.Add("-dPreserveEPSInfo=false");
-            DistillerOptions.Add("-dPreserveOPIComments=false");
-            DistillerOptions.Add("-dPreserveOverprintSettings=false");
-            DistillerOptions.Add("-dUCRandBGInfo=/Remove");
+            List<string> distillerOptions = new List<string>
+            {
+                "-dSubsetFonts=true",
+                "-dCompressFonts=true",
+                "-sProcessColorModel=DeviceRGB",
+                "-sColorConversionStrategy=sRGB",
+                "-sColorConversionStrategyForImages=sRGB",
+                "-dConvertCMYKImagesToRGB=true",
+                "-dDetectDuplicateImages=true",
+                "-dDownsampleColorImages=false",
+                "-dDownsampleGrayImages=false",
+                "-dDownsampleMonoImages=false",
+                "-dColorImageResolution=265",
+                "-dGrayImageResolution=265",
+                "-dMonoImageResolution=265",
+                "-dDoThumbnails=false",
+                "-dCreateJobTicket=false",
+                "-dPreserveEPSInfo=false",
+                "-dPreserveOPIComments=false",
+                "-dPreserveOverprintSettings=false",
+                "-dUCRandBGInfo=/Remove"
+            };
 
 
             PdfCompressorSettings pdfSettings = new PdfCompressorSettings
@@ -74,10 +70,10 @@ namespace Hocr.Cmd
                 ImageQuality = 100,
                 CompressFinalPdf = true,
                 DistillerMode = dPdfSettings.prepress,
-                DistillerOptions = string.Join(" ", DistillerOptions.ToArray())
+                DistillerOptions = string.Join(" ", distillerOptions.ToArray())
             };
 
-            _comp = new PdfCompressor(ghostScriptPathToExecutable, tesseractApplicationFolder, pdfSettings);
+            _comp = new PdfCompressor( tesseractApplicationFolder, pdfSettings);
             _comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
             _comp.OnCompressorEvent += _comp_OnCompressorEvent;
 
@@ -107,10 +103,7 @@ namespace Hocr.Cmd
             Console.ReadLine();
         }
 
-        private static void _comp_OnCompressorEvent(string msg)
-        {
-            Console.WriteLine(msg);
-        }
+        private static void _comp_OnCompressorEvent(string msg) { Console.WriteLine(msg); }
 
         private static void Compressor_OnExceptionOccurred(PdfCompressor c, Exception x)
         {
