@@ -20,10 +20,22 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
             _dpi = dpi;
         }
 
-        private static string DllFile => Path.Combine(
-            Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) ?? throw new InvalidOperationException(),
-            "dlls",
-            BuildDetect.InternalCheckIsWow64() ? "gsdll32.dll" : "gsdll64.dll");
+        private static string DllFile {
+            get
+            {
+                var assembly = Assembly.GetEntryAssembly();
+                if (assembly!=null && assembly.Location!=null)
+                    try
+                    {
+                        return Path.Combine(Path.GetDirectoryName(assembly.Location), "dlls", BuildDetect.InternalCheckIsWow64() ? "gsdll32.dll" : "gsdll64.dll");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                    
+                return Path.Combine( Environment.CurrentDirectory,"dlls", BuildDetect.InternalCheckIsWow64() ? "gsdll32.dll" : "gsdll64.dll");
+            }
+    } 
 
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {

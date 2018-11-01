@@ -26,7 +26,22 @@ namespace Net.FairfieldTek.Hocr
             string dataFolder = Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
             string dataPath = TempData.Instance.CreateDirectory(sessionName, dataFolder);
             string outputFile = Path.Combine(dataPath, Path.GetFileNameWithoutExtension(Path.GetRandomFileName()));
-            string enginePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) ?? throw new InvalidOperationException(),"tessdata");
+
+            string enginePath = string.Empty;
+            try
+            {
+                enginePath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) ?? throw new InvalidOperationException(), "tessdata");
+            }
+            catch (Exception e)
+            {
+                enginePath = Path.Combine(Environment.CurrentDirectory, "tessdata");
+            }
+
+
+
+
+
+
             using (TesseractEngine engine = new TesseractEngine(enginePath, "eng"))
             {
                 using (var img = Pix.LoadFromFile(imagePath))
