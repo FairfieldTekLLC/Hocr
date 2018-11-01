@@ -8,6 +8,8 @@ I have personally tested this library with over 110 thousand PDFs.  Beyond a few
 
 Internally, Hocr uses Tesseract, GhostScript, iTextSharp and the HtmlAgilityPack.  Please check the licensing for each nuget to make sure you are in compliance.
 
+This library IS THREADSAFE so you can process multiple PDF's at the same time in different threads, you do not need to process them one at a time.
+
 ## Use Hocr!
 
 Example Usage:
