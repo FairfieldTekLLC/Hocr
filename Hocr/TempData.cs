@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace Hocr
+namespace Net.FairfieldTek.Hocr
 {
     public class TempData : IDisposable
     {

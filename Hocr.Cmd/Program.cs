@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Hocr.Enums;
-using Hocr.Pdf;
+using Net.FairfieldTek.Hocr.Enums;
+using Net.FairfieldTek.Hocr.Pdf;
 
 namespace Hocr.Cmd
 {

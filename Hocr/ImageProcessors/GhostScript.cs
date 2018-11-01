@@ -4,10 +4,10 @@ using System.IO;
 using System.Reflection;
 using Ghostscript.NET;
 using Ghostscript.NET.Processor;
-using Hocr.Enums;
-using Hocr.Util;
+using Net.FairfieldTek.Hocr.Enums;
+using Net.FairfieldTek.Hocr.Util;
 
-namespace Hocr.ImageProcessors
+namespace Net.FairfieldTek.Hocr.ImageProcessors
 {
     internal class GhostScript
     {

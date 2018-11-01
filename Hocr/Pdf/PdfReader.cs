@@ -1,7 +1,7 @@
 ﻿using System;
-using Hocr.ImageProcessors;
+using Net.FairfieldTek.Hocr.ImageProcessors;
 
-namespace Hocr.Pdf
+namespace Net.FairfieldTek.Hocr.Pdf
 {
     internal class PdfReader : IDisposable
     {

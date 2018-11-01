@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using Hocr.Enums;
-using Hocr.ImageProcessors;
+using Net.FairfieldTek.Hocr.Enums;
+using Net.FairfieldTek.Hocr.ImageProcessors;
 using Rectangle = iTextSharp.text.Rectangle;
 
-namespace Hocr.Pdf
+namespace Net.FairfieldTek.Hocr.Pdf
 {
     public delegate void CompressorExceptionOccurred(PdfCompressor c, Exception x);
 

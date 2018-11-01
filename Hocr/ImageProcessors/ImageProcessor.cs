@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Hocr.ImageProcessors
+namespace Net.FairfieldTek.Hocr.ImageProcessors
 {
     internal class ImageProcessor
     {

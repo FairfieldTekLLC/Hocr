@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
 
-namespace Hocr.HocrElements
+namespace Net.FairfieldTek.Hocr.HocrElements
 {
     internal class Parser
     {

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Hocr.Util
+namespace Net.FairfieldTek.Hocr.Util
 {
     public class BuildDetect
     {

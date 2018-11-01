@@ -1,7 +1,7 @@
-﻿using Hocr.Enums;
-using iTextSharp.text;
+﻿using iTextSharp.text;
+using Net.FairfieldTek.Hocr.Enums;
 
-namespace Hocr.Pdf
+namespace Net.FairfieldTek.Hocr.Pdf
 {
     public class PdfCompressorSettings
     {

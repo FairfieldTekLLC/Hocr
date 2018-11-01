@@ -5,15 +5,15 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using Hocr.Enums;
-using Hocr.HocrElements;
-using Hocr.ImageProcessors;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Net.FairfieldTek.Hocr.Enums;
+using Net.FairfieldTek.Hocr.HocrElements;
+using Net.FairfieldTek.Hocr.ImageProcessors;
 using Image = System.Drawing.Image;
 using Rectangle = iTextSharp.text.Rectangle;
 
-namespace Hocr.Pdf
+namespace Net.FairfieldTek.Hocr.Pdf
 {
     public delegate Image ProcessImageForDisplay(Image image);
 

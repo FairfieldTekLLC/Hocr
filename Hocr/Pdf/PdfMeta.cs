@@ -1,4 +1,4 @@
-﻿namespace Hocr.Pdf
+﻿namespace Net.FairfieldTek.Hocr.Pdf
 {
     public class PdfMeta
     {

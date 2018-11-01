@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Hocr.HocrElements
+namespace Net.FairfieldTek.Hocr.HocrElements
 {
     internal class BBox
     {

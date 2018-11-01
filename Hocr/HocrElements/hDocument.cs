@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Hocr.HocrElements
+namespace Net.FairfieldTek.Hocr.HocrElements
 {
     internal class HDocument : HOcrClass
     {

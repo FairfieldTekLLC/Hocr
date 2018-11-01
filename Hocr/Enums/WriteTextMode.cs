@@ -1,4 +1,4 @@
-﻿namespace Hocr.Enums
+﻿namespace Net.FairfieldTek.Hocr.Enums
 {
     public enum WriteTextMode
     {

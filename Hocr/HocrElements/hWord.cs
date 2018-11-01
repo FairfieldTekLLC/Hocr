@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hocr.HocrElements
+namespace Net.FairfieldTek.Hocr.HocrElements
 {
     internal class HWord : HOcrClass
     {

@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using Hocr.HocrElements;
-using Hocr.ImageProcessors;
-using Hocr.Util;
+using Net.FairfieldTek.Hocr.HocrElements;
+using Net.FairfieldTek.Hocr.ImageProcessors;
 using Tesseract;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
-namespace Hocr
+namespace Net.FairfieldTek.Hocr
 {
     internal class OcrController
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hocr.HocrElements
+namespace Net.FairfieldTek.Hocr.HocrElements
 {
     /// <summary>
     ///     Represents one line of text in a paragraph.
