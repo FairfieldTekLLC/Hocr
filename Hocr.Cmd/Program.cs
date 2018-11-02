@@ -88,13 +88,13 @@ namespace Hocr.Cmd
             new Thread(() =>
             {
                 Console.WriteLine("Started Test 2");
-                Example(data1, @"Test1_ocr.pdf");
+                Example(data1, @"Test2_ocr.pdf");
             }).Start();
 
             new Thread(() =>
             {
                 Console.WriteLine("Started Test 3");
-                Example(data2, @"Test1_ocr.pdf");
+                Example(data2, @"Test3_ocr.pdf");
             }).Start();
 
             int counter = 0;
