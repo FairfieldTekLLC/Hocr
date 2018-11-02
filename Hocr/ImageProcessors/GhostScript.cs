@@ -1,81 +1,34 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing.Text;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Threading;
-using Ghostscript.NET;
-using Ghostscript.NET.Processor;
-using Net.FairfieldTek.Hocr.Enums;
-using Net.FairfieldTek.Hocr.Util;
 
-namespace Net.FairfieldTek.Hocr.ImageProcessors
+using Net.FairfieldTek.Hocr;
+using Net.FairfieldTek.Hocr.Enums;
+
+namespace Hocr.ImageProcessors
 {
     internal class GhostScript
     {
-
-
-
-        internal string DllPath {
-            get {
-                var assembly = Assembly.GetEntryAssembly();
-                string path = string.Empty;
-                if (assembly != null)
-                    try
-                    {
-                        path = Path.Combine(Path.GetDirectoryName(assembly.Location), "dlls", BuildDetect.InternalCheckIsWow64() ? $"gsdll32-0.dll" : $"gsdll64-0.dll");
-                    }
-                    catch (Exception e)
-                    {
-                        path = Path.Combine(Environment.CurrentDirectory, "dlls", BuildDetect.InternalCheckIsWow64() ? $"gsdll32-0.dll" : $"gsdll64-0.dll");
-                    }
-                return path;
-            }
-        }
-
         private readonly int _dpi;
+        private readonly string _path;
 
-        public GhostScript(int dpi)
+        public GhostScript(string path, int dpi)
         {
-
+            _path = path;
             _dpi = dpi;
         }
 
-
-      static  private object Locker = new object();
-
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
-
             string outPut = GetOutPutFileName(sessionName, ".bmp");
             pdf = "\"" + pdf + "\"";
 
-            //GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllFile)));
-            List<string> switches = new List<string>
-                {
-                    "-dNOPAUSE",
-                    "-q",
-                    $"-r{_dpi}",
-                    "-sDEVICE=bmp16m",
-                    "-dBATCH",
-                    "-dGraphicsAlphaBits=4",
-                    "-dTextAlphaBits=4",
-                    $"-dFirstPage={startPageNum}",
-                    $"-dLastPage={endPageNum}",
-                    $"-sOutputFile={outPut}",
-                    pdf,
-                    "-c",
-                    "quit"
-                };
-            lock (Locker)
-            {
 
-                GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllPath)));
-                proc.Process(switches.ToArray());
-                proc.Dispose();
-            }
+            string command = string.Concat($"-dNOPAUSE -q -r{_dpi} -sDEVICE=bmp16m -dBATCH -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -dFirstPage=",
+                startPageNum.ToString(), " -dLastPage=", endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " -c quit");
+
+            RunCommand(command);
             return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
-
         }
 
         private static string GetOutPutFileName(string sessionName, string extWithDot)
@@ -88,7 +41,6 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
             dPdfSettings dPdfSettings = dPdfSettings.screen,
             string options = "")
         {
-
             string clevel;
             switch (level)
             {
@@ -112,33 +64,28 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
             }
 
             string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-
-
-            //
-            List<string> switches = new List<string>
-                {
-                    "-q",
-                    "-dNOPAUSE",
-                    "-dBATCH",
-                    "-dSAFER",
-                    "-sDEVICE=pdfwrite",
-                    $"-dCompatibilityLevel={clevel}",
-                    $"-dPDFSETTINGS=/{dPdfSettings}",
-                    options,
-                    $"-sOutputFile={'"'}{outPutFileName}{'"'}",
-                    $"{'"'}{inputPdf}{'"'}",
-                    "-c",
-                    "quit"
-                };
-            lock (Locker)
-            {
-                GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllPath)));
-                proc.Process(switches.ToArray());
-                proc.Dispose();
-            }
-                
+            string command =
+                $@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/{dPdfSettings} {options} -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
+            RunCommand(command);
             return outPutFileName;
+        }
 
+        private void RunCommand(string command)
+        {
+            ProcessStartInfo startexe = new ProcessStartInfo(_path, command)
+            {
+                WorkingDirectory = Directory.GetCurrentDirectory(),
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = false,
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            };
+            using (Process proc = Process.Start(startexe))
+            {
+                proc?.WaitForExit();
+            }
         }
     }
 }

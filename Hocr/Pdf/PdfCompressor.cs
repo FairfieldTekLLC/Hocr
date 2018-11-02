@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using Hocr.ImageProcessors;
+using iTextSharp.text.io;
 using Net.FairfieldTek.Hocr.Enums;
 using Net.FairfieldTek.Hocr.ImageProcessors;
 using Rectangle = iTextSharp.text.Rectangle;
@@ -13,11 +15,16 @@ namespace Net.FairfieldTek.Hocr.Pdf
 
     public delegate string PreProcessImage(string bitmapPath);
 
+    
+
+
     public class PdfCompressor
     {
-        public PdfCompressor(PdfCompressorSettings settings = null)
+        private string GhostScriptPath { get; set; } = string.Empty;
+        public PdfCompressor( string ghostScriptPath,PdfCompressorSettings settings = null)
         {
             PdfSettings = settings ?? new PdfCompressorSettings();
+            GhostScriptPath = ghostScriptPath;
         }
         
         public PdfCompressorSettings PdfSettings { get; }
@@ -27,7 +34,7 @@ namespace Net.FairfieldTek.Hocr.Pdf
             string pageBody = "";
 
             OnCompressorEvent?.Invoke(sessionName + " Creating PDF Reader");
-            PdfReader reader = new PdfReader(inputFileName,  PdfSettings.Dpi);
+            PdfReader reader = new PdfReader(inputFileName,  PdfSettings.Dpi,GhostScriptPath);
 
             OnCompressorEvent?.Invoke(sessionName + " Creating PDF Writer");
             PdfCreator writer =
@@ -90,7 +97,7 @@ namespace Net.FairfieldTek.Hocr.Pdf
                 if (PdfSettings.CompressFinalPdf)
                 {
                     OnCompressorEvent?.Invoke(sessionName + " Compressing output");
-                    GhostScript gs = new GhostScript( PdfSettings.Dpi);
+                    GhostScript gs = new GhostScript(GhostScriptPath, PdfSettings.Dpi);
                     outputFileName = gs.CompressPdf(outputDataFilePath, sessionName, PdfSettings.PdfCompatibilityLevel, PdfSettings.DistillerMode,
                         PdfSettings.DistillerOptions);
                 }

@@ -70,7 +70,7 @@ namespace Hocr.Cmd
                 DistillerOptions = string.Join(" ", distillerOptions.ToArray())
             };
 
-            _comp = new PdfCompressor(pdfSettings);
+            _comp = new PdfCompressor(@"C:\gs\gs9.24\bin\gswin64c.exe", pdfSettings);
             _comp.OnExceptionOccurred += Compressor_OnExceptionOccurred;
             _comp.OnCompressorEvent += _comp_OnCompressorEvent;
 

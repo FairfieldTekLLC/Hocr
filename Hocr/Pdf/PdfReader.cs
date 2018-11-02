@@ -1,4 +1,5 @@
 ﻿using System;
+using Hocr.ImageProcessors;
 using Net.FairfieldTek.Hocr.ImageProcessors;
 
 namespace Net.FairfieldTek.Hocr.Pdf
@@ -7,10 +8,11 @@ namespace Net.FairfieldTek.Hocr.Pdf
     {
         private readonly int _dpi;
 
+        private string GhostScriptPath { get; set; }
 
-        public PdfReader(string sourcePdf,  int dpi)
+        public PdfReader(string sourcePdf,  int dpi,string ghostscriptPath)
         {
-
+            GhostScriptPath = ghostscriptPath;
             SourcePdf = sourcePdf;
             TextReader = new iTextSharp.text.pdf.PdfReader(sourcePdf);
             _dpi = dpi;
@@ -41,7 +43,7 @@ namespace Net.FairfieldTek.Hocr.Pdf
 
         private string GetPageImageWithGhostScript(int pageNumber, string sessionName)
         {
-            GhostScript g = new GhostScript( _dpi);
+            GhostScript g = new GhostScript(GhostScriptPath, _dpi);
             string imgFile = g.ConvertPdfToBitmap(SourcePdf, pageNumber, pageNumber, sessionName);
             return imgFile;
         }
