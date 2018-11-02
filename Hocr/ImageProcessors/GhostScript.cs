@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -13,82 +14,26 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
     internal class GhostScript
     {
 
-        internal class GhostScriptInstance : IDisposable
-        {
-            private int Innum {
-                get; set;
-            }
-            public GhostscriptProcessor GhostscriptProcessor {
-                get;
-            }
 
-            public GhostScriptInstance()
-            {
-                Innum = GhostScriptPool.Instance.GetInstance();
+
+        internal string DllPath {
+            get {
                 var assembly = Assembly.GetEntryAssembly();
-                string path=string.Empty;
+                string path = string.Empty;
                 if (assembly != null)
                     try
                     {
-                        path = Path.Combine(Path.GetDirectoryName(assembly.Location), "dlls", BuildDetect.InternalCheckIsWow64() ? $"gsdll32-{Innum}.dll" : $"gsdll64-{Innum}.dll");
+                        path = Path.Combine(Path.GetDirectoryName(assembly.Location), "dlls", BuildDetect.InternalCheckIsWow64() ? $"gsdll32-0.dll" : $"gsdll64-0.dll");
                     }
                     catch (Exception e)
                     {
-                        path = Path.Combine(Environment.CurrentDirectory, "dlls", BuildDetect.InternalCheckIsWow64() ? $"gsdll32-{Innum}.dll" : $"gsdll64-{Innum}.dll");
+                        path = Path.Combine(Environment.CurrentDirectory, "dlls", BuildDetect.InternalCheckIsWow64() ? $"gsdll32-0.dll" : $"gsdll64-0.dll");
                     }
-
-                GhostscriptProcessor = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(path)));
+                return path;
             }
-
-            public void Dispose()
-            {
-                GhostScriptPool.Instance.GiveInstance(Innum);
-                GhostscriptProcessor.Dispose();
-            }
-        }
-
-
-
-        internal class GhostScriptPool
-        {
-            private static readonly Lazy<GhostScriptPool> lazy = new Lazy<GhostScriptPool>(() => new GhostScriptPool(5));
-            public static GhostScriptPool Instance => lazy.Value;
-
-            private readonly Stack<int> _instances = new Stack<int>();
-            private GhostScriptPool(int maxInstance)
-            {
-                for (int i = 0; i <= maxInstance; i++)
-                    _instances.Push(i);
-            }
-
-            private readonly object _locker = new object();
-            public int GetInstance()
-            {
-                while (true)
-                {
-                    lock (_locker)
-                    {
-                        if (_instances.Count != 0)
-                            return (_instances.Pop());
-                        Thread.Sleep(10);
-                    }
-
-                }
-
-            }
-            public void GiveInstance(int i)
-            {
-                lock (_locker)
-                {
-                    _instances.Push(i);
-                }
-            }
-
-
         }
 
         private readonly int _dpi;
-
 
         public GhostScript(int dpi)
         {
@@ -97,6 +42,7 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
         }
 
 
+      static  private object Locker = new object();
 
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
@@ -121,8 +67,13 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
                     "-c",
                     "quit"
                 };
-            using (var gs = new GhostScriptInstance())
-                gs.GhostscriptProcessor.Process(switches.ToArray());
+            lock (Locker)
+            {
+
+                GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllPath)));
+                proc.Process(switches.ToArray());
+                proc.Dispose();
+            }
             return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
 
         }
@@ -163,7 +114,7 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
             string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
 
 
-            //GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllFile)));
+            //
             List<string> switches = new List<string>
                 {
                     "-q",
@@ -179,8 +130,13 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
                     "-c",
                     "quit"
                 };
-            using (var gs = new GhostScriptInstance())
-                gs.GhostscriptProcessor.Process(switches.ToArray());
+            lock (Locker)
+            {
+                GhostscriptProcessor proc = new GhostscriptProcessor(new GhostscriptLibrary(new GhostscriptVersionInfo(DllPath)));
+                proc.Process(switches.ToArray());
+                proc.Dispose();
+            }
+                
             return outPutFileName;
 
         }
