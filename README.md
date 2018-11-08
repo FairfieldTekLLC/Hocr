@@ -95,14 +95,23 @@ namespace Hocr.Cmd
             byte[] data1 = File.ReadAllBytes(@"Test2.pdf");
             byte[] data2 = File.ReadAllBytes(@"Test3.pdf");
 
-            Example(data, @"Test1_ocr.pdf");
-            Console.WriteLine("Started Test 1");
+            new Thread(()=>
+            {
+                Console.WriteLine("Started Test 1");
+                Example(data, @"Test1_ocr.pdf");
+            }).Start();
 
-            Example(data1, @"Test2_ocr.pdf");
-            Console.WriteLine("Starting Test 2");
+            new Thread(() =>
+            {
+                Console.WriteLine("Started Test 2");
+                Example(data1, @"Test2_ocr.pdf");
+            }).Start();
 
-            Example(data2, @"Test3_ocr.pdf");
-            Console.WriteLine("Starting Test 3");
+            new Thread(() =>
+            {
+                Console.WriteLine("Started Test 3");
+                Example(data2, @"Test3_ocr.pdf");
+            }).Start();
 
             int counter = 0;
             while (_running)
