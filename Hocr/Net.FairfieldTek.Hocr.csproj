@@ -93,6 +93,10 @@
     <Compile Include="Enums\PdfImageType.cs" />
     <Compile Include="Enums\PdfMode.cs" />
     <Compile Include="Enums\WriteTextMode.cs" />
+    <Compile Include="Exceptions\FailedToGenerateException.cs" />
+    <Compile Include="Exceptions\GhostScriptExecuteException.cs" />
+    <Compile Include="Exceptions\InvalidBitmapException.cs" />
+    <Compile Include="Exceptions\PageCountMismatchException.cs" />
     <Compile Include="HocrElements\BBox.cs" />
     <Compile Include="HocrElements\hChar.cs" />
     <Compile Include="HocrElements\hDocument.cs" />

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using Hocr.ImageProcessors;
 using iTextSharp.text.io;
 using Net.FairfieldTek.Hocr.Enums;
+using Net.FairfieldTek.Hocr.Exceptions;
 using Net.FairfieldTek.Hocr.ImageProcessors;
 using Rectangle = iTextSharp.text.Rectangle;
 
@@ -65,19 +65,33 @@ namespace Net.FairfieldTek.Hocr.Pdf
                 writer.Dispose();
                 reader.Dispose();
                 OnExceptionOccurred?.Invoke(this, x);
+                throw;
             }
-
-            return "";
         }
 
         public event CompressorExceptionOccurred OnExceptionOccurred;
         public event CompressorEvent OnCompressorEvent;
         public event PreProcessImage OnPreProcessImage;
 
+        private int GetPages(byte[] data)
+        {
+            try
+            {
+                using (iTextSharp.text.pdf.PdfReader pdfReader = new iTextSharp.text.pdf.PdfReader(data))
+                    return pdfReader.NumberOfPages;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return 0;
+            }
+        }
+
         public Tuple<byte[], string> CreateSearchablePdf(byte[] fileData, PdfMeta metaData)
         {
             try
             {
+                int PageCountStart = GetPages(fileData);
                 string sessionName = TempData.Instance.CreateNewSession();
                 OnCompressorEvent?.Invoke("Created Session:" + sessionName);
                 string inputDataFilePath = TempData.Instance.CreateTempFile(sessionName, ".pdf");
@@ -103,14 +117,19 @@ namespace Net.FairfieldTek.Hocr.Pdf
                 }
 
                 byte[] outFile = File.ReadAllBytes(outputFileName);
+                int PageCountEnd = GetPages(outFile);
                 OnCompressorEvent?.Invoke(sessionName + " Destroying session");
                 TempData.Instance.DestroySession(sessionName);
+
+                if (PageCountEnd != PageCountStart)
+                    throw new PageCountMismatchException("Page count is different", PageCountStart, PageCountEnd);
+
                 return new Tuple<byte[], string>(outFile, pageBody);
             }
             catch (Exception e)
             {
                 OnExceptionOccurred?.Invoke(this, e);
-                throw;
+                throw new FailedToGenerateException("Error in: CreateSearchablePdf", e);
             }
         }
     }

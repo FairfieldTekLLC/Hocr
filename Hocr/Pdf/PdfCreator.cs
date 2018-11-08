@@ -67,65 +67,53 @@ namespace Net.FairfieldTek.Hocr.Pdf
         /// <param name="dimension"></param>
         private void AddImage(Image image, string sessionName, Rectangle dimension)
         {
-            try
-            {
-                if (OnProcessImageForDisplay != null)
-                    image = OnProcessImageForDisplay(image);
-                Bitmap bmp = ImageProcessor.GetAsBitmap(image, PdfSettings.Dpi);
-                iTextSharp.text.Image i = GetImageForPdf(bmp, sessionName);
-                AddImage(i, dimension);
-                bmp.Dispose();
-            }
-            catch (Exception x)
-            {
-                Debug.WriteLine(x.Message);
-                throw;
-            }
+
+            if (OnProcessImageForDisplay != null)
+                image = OnProcessImageForDisplay(image);
+            Bitmap bmp = ImageProcessor.GetAsBitmap(image, PdfSettings.Dpi);
+            iTextSharp.text.Image i = GetImageForPdf(bmp, sessionName);
+            AddImage(i, dimension);
+            bmp.Dispose();
+
         }
 
         private void AddImage(iTextSharp.text.Image image, Rectangle dimension)
         {
-            try
+
+            if (dimension == null)
             {
-                if (dimension == null)
+                if (PdfSettings.PdfPageSize == null)
                 {
-                    if (PdfSettings.PdfPageSize == null)
-                    {
-                        //Getting Width of the image width adding the page right & left margin
-                        float width = image.Width / PdfSettings.Dpi * 72;
+                    //Getting Width of the image width adding the page right & left margin
+                    float width = image.Width / PdfSettings.Dpi * 72;
 
-                        //Getting Height of the image height adding the page top & bottom margin
-                        float height = image.Height / PdfSettings.Dpi * 72;
+                    //Getting Height of the image height adding the page top & bottom margin
+                    float height = image.Height / PdfSettings.Dpi * 72;
 
-                        //Creating pdf rectangle with the specified height & width for page size declaration
-                        dimension = new Rectangle(width, height);
-                    }
-                    else
-                    {
-                        dimension = PdfSettings.PdfPageSize;
-                    }
+                    //Creating pdf rectangle with the specified height & width for page size declaration
+                    dimension = new Rectangle(width, height);
                 }
-                /*you __MUST__ call SetPageSize() __BEFORE__ calling NewPage()
-                * AND __BEFORE__ adding the image to the document
-                */
-
-                //Changing the page size of the pdf document based on the rectangle defined
-
-
-                float dHeight = dimension.Height / _dpi;
-                float dwidth = dimension.Width / _dpi;
-                Rectangle newDim = new Rectangle(dwidth * 72.0f, dHeight * 72.0f);
-                _doc.SetPageSize(newDim);
-                image.SetAbsolutePosition(0, 0);
-                image.ScaleAbsolute(_doc.PageSize.Width, _doc.PageSize.Height);
-                _doc.NewPage();
-                _doc.Add(image);
+                else
+                {
+                    dimension = PdfSettings.PdfPageSize;
+                }
             }
-            catch (Exception x)
-            {
-                Debug.WriteLine(x.Message);
-                throw;
-            }
+            /*you __MUST__ call SetPageSize() __BEFORE__ calling NewPage()
+            * AND __BEFORE__ adding the image to the document
+            */
+
+            //Changing the page size of the pdf document based on the rectangle defined
+
+
+            float dHeight = dimension.Height / _dpi;
+            float dwidth = dimension.Width / _dpi;
+            Rectangle newDim = new Rectangle(dwidth * 72.0f, dHeight * 72.0f);
+            _doc.SetPageSize(newDim);
+            image.SetAbsolutePosition(0, 0);
+            image.ScaleAbsolute(_doc.PageSize.Width, _doc.PageSize.Height);
+            _doc.NewPage();
+            _doc.Add(image);
+
         }
 
 
@@ -254,16 +242,10 @@ namespace Net.FairfieldTek.Hocr.Pdf
         {
             _doc = new Document();
             _doc.SetMargins(0, 0, 0, 0);
-            try
-            {
-                _writer = PdfWriter.GetInstance(_doc, new FileStream(fileName, FileMode.Create));
-                _writer.CompressionLevel = 100;
-                _writer.SetFullCompression();
-            }
-            catch (Exception)
-            {
-                //Throw away.
-            }
+
+            _writer = PdfWriter.GetInstance(_doc, new FileStream(fileName, FileMode.Create));
+            _writer.CompressionLevel = 100;
+            _writer.SetFullCompression();
 
             _writer.SetMargins(0, 0, 0, 0);
             _doc.Open();

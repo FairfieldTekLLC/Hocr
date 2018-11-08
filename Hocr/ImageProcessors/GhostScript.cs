@@ -1,11 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-
-using Net.FairfieldTek.Hocr;
 using Net.FairfieldTek.Hocr.Enums;
+using Net.FairfieldTek.Hocr.Exceptions;
 
-namespace Hocr.ImageProcessors
+namespace Net.FairfieldTek.Hocr.ImageProcessors
 {
     internal class GhostScript
     {
@@ -20,15 +19,19 @@ namespace Hocr.ImageProcessors
 
         public string ConvertPdfToBitmap(string pdf, int startPageNum, int endPageNum, string sessionName)
         {
-            string outPut = GetOutPutFileName(sessionName, ".bmp");
-            pdf = "\"" + pdf + "\"";
-
-
-            string command = string.Concat($"-dNOPAUSE -q -r{_dpi} -sDEVICE=bmp16m -dBATCH -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -dFirstPage=",
-                startPageNum.ToString(), " -dLastPage=", endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " -c quit");
-
-            RunCommand(command);
-            return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
+            try
+            {
+                string outPut = GetOutPutFileName(sessionName, ".bmp");
+                pdf = "\"" + pdf + "\"";
+                string command = string.Concat($"-dNOPAUSE -q -r{_dpi} -sDEVICE=bmp16m -dBATCH -dGraphicsAlphaBits=4 -dTextAlphaBits=4 -dFirstPage=",
+                    startPageNum.ToString(), " -dLastPage=", endPageNum.ToString(), " -sOutputFile=" + outPut + " " + pdf + " -c quit");
+                RunCommand(command);
+                return new FileInfo(outPut.Replace('"', ' ').Trim()).FullName;
+            }
+            catch (Exception e)
+            {
+                throw new GhostScriptExecuteException("Hocr.ImageProcessors.GhostScript - ConvertPdfToBitmap", e);
+            }
         }
 
         private static string GetOutPutFileName(string sessionName, string extWithDot)
@@ -41,33 +44,40 @@ namespace Hocr.ImageProcessors
             dPdfSettings dPdfSettings = dPdfSettings.screen,
             string options = "")
         {
-            string clevel;
-            switch (level)
+            try
             {
-                case PdfCompatibilityLevel.Acrobat_4_1_3:
-                    clevel = "1.3";
-                    break;
-                case PdfCompatibilityLevel.Acrobat_5_1_4:
-                    clevel = "1.4";
-                    break;
-                case PdfCompatibilityLevel.Acrobat_6_1_5:
-                    clevel = "1.5";
-                    break;
-                case PdfCompatibilityLevel.Acrobat_7_1_6:
-                    clevel = "1.6";
-                    break;
-                case PdfCompatibilityLevel.Acrobat_7_1_7:
-                    clevel = "1.7";
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(level), level, null);
-            }
+                string clevel;
+                switch (level)
+                {
+                    case PdfCompatibilityLevel.Acrobat_4_1_3:
+                        clevel = "1.3";
+                        break;
+                    case PdfCompatibilityLevel.Acrobat_5_1_4:
+                        clevel = "1.4";
+                        break;
+                    case PdfCompatibilityLevel.Acrobat_6_1_5:
+                        clevel = "1.5";
+                        break;
+                    case PdfCompatibilityLevel.Acrobat_7_1_6:
+                        clevel = "1.6";
+                        break;
+                    case PdfCompatibilityLevel.Acrobat_7_1_7:
+                        clevel = "1.7";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(level), level, null);
+                }
 
-            string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
-            string command =
-                $@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/{dPdfSettings} {options} -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
-            RunCommand(command);
-            return outPutFileName;
+                string outPutFileName = TempData.Instance.CreateTempFile(sessionName, ".pdf");
+                string command =
+                    $@"-q -dNOPAUSE -dBATCH -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel={clevel} -dPDFSETTINGS=/{dPdfSettings} {options} -sOutputFile={'"'}{outPutFileName}{'"'} {'"'}{inputPdf}{'"'} -c quit";
+                RunCommand(command);
+                return outPutFileName;
+            }
+            catch (Exception e)
+            {
+                throw new GhostScriptExecuteException("Hocr.ImageProcessors.GhostScript - CompressPdf", e);
+            }
         }
 
         private void RunCommand(string command)

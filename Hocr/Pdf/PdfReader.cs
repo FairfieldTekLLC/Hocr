@@ -1,5 +1,4 @@
 ﻿using System;
-using Hocr.ImageProcessors;
 using Net.FairfieldTek.Hocr.ImageProcessors;
 
 namespace Net.FairfieldTek.Hocr.Pdf

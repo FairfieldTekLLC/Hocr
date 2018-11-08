@@ -4,6 +4,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Net.FairfieldTek.Hocr.Exceptions;
 
 namespace Net.FairfieldTek.Hocr.ImageProcessors
 {
@@ -151,9 +152,10 @@ namespace Net.FairfieldTek.Hocr.ImageProcessors
 
                 return bmp;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return null;
+                throw new InvalidBitmapException(" Hocr.ImageProcessors.ImageProcessor - GetAsBitmap", e);
+                
             }
         }
 
