@@ -1,4 +1,9 @@
 ## Hocr
+
+**********************THIS REPO IS NOW DEPRECIATED, PLEASE USE [HOCR.NET](https://github.com/FairfieldTekLLC/Hocr.Net)**********************
+
+
+
 C# Library for converting PDF files to Searchable PDF Files
 
 * Need to batch convert 100 of scan PDF's to Searchable PFS's?
